@@ -2,13 +2,10 @@ import { Home, LineChart, Package, ShoppingCart, Users } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "./ui/badge";
 import { FC } from "react";
+import { NavLink } from "@/types/props";
 
 interface NavigationSidebarProps {
-  links: {
-    href: string;
-    text: string;
-    icon: JSX.Element;
-  }[];
+  links: NavLink[];
 }
 
 const NavigationSidebar: FC<NavigationSidebarProps> = ({ links }) => {
@@ -23,11 +20,11 @@ const NavigationSidebar: FC<NavigationSidebarProps> = ({ links }) => {
             {links.map((link) => (
               <Link
                 href={link.href}
-                key={link.text}
+                key={link.label}
                 className="flex items-center gap-3 rounded-lg px-3 py-3 text-muted-foreground transition-all hover:text-primary hover:bg-secondary"
               >
                 {link.icon}
-                {link.text}
+                {link.label}
               </Link>
             ))}
           </nav>
