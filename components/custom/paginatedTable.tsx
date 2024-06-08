@@ -26,7 +26,7 @@ interface TableHeader {
 }
 
 interface PaginatedTableProps {
-  tableHeader?: string;
+  tableHead?: React.ReactNode;
   columns: TableHeader[];
   data: Record<string, any>[];
 }
@@ -35,38 +35,38 @@ const PaginatedTable = React.forwardRef<
   HTMLTableElement,
   PaginatedTableProps &
     React.HTMLAttributes<TableHTMLAttributes<PaginatedTableProps>>
->(({ columns, className, data, ...props }, ref) => {
+>(({ columns, tableHead, className, data, ...props }, ref) => {
   return (
     <div className={cn("flex flex-col gap-1 w-full", className)}>
-      <h1 className="text-2xl text-accent-foreground font-bold self-start">
-        {props.tableHeader}
-      </h1>
-      <Table ref={ref} className="border border-muted-foreground rounded-md ">
-        <TableHeader>
-          <TableRow>
-            {columns.map((header) => (
-              <TableHead
-                className="text-accent-foreground font-semibold"
-                key={header.name}
-              >
-                {header.label}
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.map((row, index) => (
-            <TableRow key={index}>
-              {columns.map((column) => (
-                <TableCell key={column.name}>
-                  {column.render ? column.render(row) : row[column.name]}
-                </TableCell>
+      <div>{tableHead}</div>
+      <div className="border border-dotted border-muted-foreground rounded-lg">
+        <Table ref={ref} className=" ">
+          <TableHeader>
+            <TableRow>
+              {columns.map((header) => (
+                <TableHead
+                  className="text-accent-foreground font-semibold"
+                  key={header.name}
+                >
+                  {header.label}
+                </TableHead>
               ))}
-              <TableCell></TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {data.map((row, index) => (
+              <TableRow key={index}>
+                {columns.map((column) => (
+                  <TableCell key={column.name}>
+                    {column.render ? column.render(row) : row[column.name]}
+                  </TableCell>
+                ))}
+                <TableCell></TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 });

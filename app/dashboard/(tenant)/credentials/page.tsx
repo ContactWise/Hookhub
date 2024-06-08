@@ -106,7 +106,11 @@ const CredentialsPage = () => {
         />
       </div>
       <PaginatedTable
-        tableHeader="Your Keys"
+        tableHead={
+          <div className="flex gap-4">
+            <h2 className="text-lg font-semibold">Credentials</h2>
+          </div>
+        }
         className="mt-8"
         columns={HEADERS}
         data={DATA}
