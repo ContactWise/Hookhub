@@ -15,9 +15,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
+
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/router";
+import PaginationControls from "./paginationControls";
 
 interface TableHeader {
   name: string;
@@ -27,49 +29,57 @@ interface TableHeader {
 
 interface PaginatedTableProps {
   tableHead?: React.ReactNode;
+  tableFooter?: React.ReactNode;
   columns: TableHeader[];
   data: Record<string, any>[];
+  paginated?: boolean;
 }
 
 const PaginatedTable = React.forwardRef<
   HTMLTableElement,
   PaginatedTableProps &
     React.HTMLAttributes<TableHTMLAttributes<PaginatedTableProps>>
->(({ columns, tableHead, className, data, ...props }, ref) => {
-  return (
-    <div className={cn("flex flex-col gap-1 w-full", className)}>
-      <div>{tableHead}</div>
-      <div className="border border-dotted border-muted-foreground rounded-lg">
-        <Table ref={ref} className=" ">
-          <TableHeader>
-            <TableRow>
-              {columns.map((header) => (
-                <TableHead
-                  className="text-accent-foreground font-semibold"
-                  key={header.name}
-                >
-                  {header.label}
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.map((row, index) => (
-              <TableRow key={index}>
-                {columns.map((column) => (
-                  <TableCell key={column.name}>
-                    {column.render ? column.render(row) : row[column.name]}
-                  </TableCell>
+>(
+  (
+    { columns, tableHead, tableFooter, className, data, paginated, ...props },
+    ref
+  ) => {
+    return (
+      <div className={cn("flex flex-col gap-1 w-full", className)}>
+        <div className="">{tableHead}</div>
+        <div className="border border-dotted border-muted-foreground rounded-lg">
+          <Table ref={ref} className=" ">
+            <TableHeader>
+              <TableRow className="bg-muted">
+                {columns.map((header) => (
+                  <TableHead
+                    className="text-accent-foreground font-semibold"
+                    key={header.name}
+                  >
+                    {header.label}
+                  </TableHead>
                 ))}
-                <TableCell></TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {data.map((row, index) => (
+                <TableRow key={index}>
+                  {columns.map((column) => (
+                    <TableCell key={column.name}>
+                      {column.render ? column.render(row) : row[column.name]}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+        <div className="">{tableFooter}</div>
+        {paginated && <PaginationControls />}
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
 
 PaginatedTable.displayName = "Paginated Table";
 

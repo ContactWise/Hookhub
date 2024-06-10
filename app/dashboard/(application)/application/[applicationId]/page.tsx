@@ -91,9 +91,14 @@ const data = [
 ];
 
 const ApplicationPage = () => {
+  const tableHeader = (
+    <div className="flex justify-start">
+      <h1 className="text-2xl font-bold">Messages</h1>
+    </div>
+  );
   return (
     <div className="w-full">
-      <PaginatedTable columns={COLUMNS} data={data} tableHeader="Messages" />
+      <PaginatedTable columns={COLUMNS} data={data} tableHead={tableHeader} />
     </div>
   );
 };
