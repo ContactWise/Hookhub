@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import CopyButton from "@/components/custom/copyButton";
 import RegistryCard from "./_components/registryCard";
+import Typography from "@/components/custom/typography";
 
 interface Credentials {
   id: string;
@@ -104,7 +105,7 @@ const REGISTERIES_DATA = [
   {
     registryName: "Whatsapp Registry",
     description:
-      "Sample description for Whatsapp Registry Sample description for Whatsapp Registry",
+      "Sample description for Whatsapp Registry for description for Whatsapp Registry",
     evenCount: 8,
   },
 ];
@@ -113,7 +114,7 @@ const CredentialsPage = () => {
   return (
     <div className="flex flex-col items-center w-full">
       <div className="flex flex-col gap-2 md:gap-0 md:flex-row w-full justify-between">
-        <h1 className="text-2xl sm:text-4xl font-semibold">Event Registries</h1>
+        <Typography variant={"pageTitle"}>Event Registries</Typography>
         <Button size={"default"}>Create New Registry +</Button>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full mt-4">

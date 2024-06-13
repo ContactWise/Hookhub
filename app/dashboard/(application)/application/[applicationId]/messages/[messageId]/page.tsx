@@ -1,4 +1,5 @@
 import PaginatedTable from "@/components/custom/paginatedTable";
+import Typography from "@/components/custom/typography";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -90,51 +91,59 @@ const DATA = [
 
 const CredentialsPage = () => {
   return (
-    <div className="flex flex-col items-center w-full">
-      <div className="flex flex-col w-full">
-        <h2 className="scroll-m-20  pb-4 text-xl md:text-2xl font-semibold tracking-tight mb-1">
-          Message ID: 550e8400-e29b-41d4-a716-4466554
-        </h2>
-        <div className="py-4">
-          <div className="grid grid-cols-3 md:grid-cols-6 grid-flow-row-dense">
-            <div className="grid gap-3 font-semibold  col-span-1">
-              <span>Application ID</span>
-              <span>Recieved At</span>
-              <span>Status</span>
+    <>
+      <h2 className="scroll-m-20 text-xl md:text-2xl font-semibold tracking-tight mb-1"></h2>
+      <Typography variant={"pageTitle"}>
+        Message ID: 550e8400-e29b-41d4-a716-4466554
+      </Typography>
+      <ScrollArea className="flex flex-1 p-2 justify-center rounded-lg border border-dashed shadow-sm ">
+        <div className="flex flex-col items-center w-full">
+          <div className="flex flex-col w-full space-y-8">
+            <div className="grid grid-cols-3 md:grid-cols-6 grid-flow-row-dense">
+              <div className="grid gap-3 font-semibold  col-span-1">
+                <Typography variant={"formFieldTitle"}>Url</Typography>
+                <Typography variant={"formFieldTitle"}>Recieved At</Typography>
+                <Typography variant={"formFieldTitle"}>Status</Typography>
+              </div>
+              <div className="grid auto-rows-max gap-3 col-span-2 md:col-span-4">
+                <div>
+                  <code className="bg-muted px-[0.3rem] py-[0.2rem] font-mono">
+                    550e8400-e29b-41d4-a716-4466554
+                  </code>
+                </div>
+                <div>
+                  {" "}
+                  <code className="bg-muted px-[0.3rem] py-[0.2rem] font-mono">
+                    4th July 2024 @ 5:40pm (GMT+5:30)
+                  </code>
+                </div>
+                <div>
+                  <Badge variant={"success"}>Delivered</Badge>
+                </div>
+              </div>
             </div>
-            <div className="grid auto-rows-max gap-3 col-span-2 md:col-span-4">
-              <div>
-                <code className="bg-muted px-[0.3rem] py-[0.2rem] font-mono">
-                  550e8400-e29b-41d4-a716-4466554
-                </code>
-              </div>
-              <div>
-                {" "}
-                <code className="bg-muted px-[0.3rem] py-[0.2rem] font-mono">
-                  4th July 2024 @ 5:40pm (GMT+5:30)
-                </code>
-              </div>
-              <div>
-                <Badge variant={"success"}>Delivered</Badge>
-              </div>
+            <div>
+              <Typography variant={"formFieldTitle"}>Payload</Typography>
+              <ScrollArea className="h-72">
+                <div className="bg-muted text-sm font-mono  p-2 rounded-lg h-full">
+                  <pre className="p-2">{payloadData}</pre>
+                </div>
+              </ScrollArea>
             </div>
+
+            <PaginatedTable
+              tableHead={
+                <Typography variant="formFieldTitle">
+                  Message Activity
+                </Typography>
+              }
+              columns={COLUMNS}
+              data={DATA}
+            />
           </div>
-          <h4 className="font-semibold ">Payload</h4>
-          <ScrollArea className="h-72">
-            <div className="bg-muted text-sm font-mono  p-2 rounded-lg h-full">
-              <pre className="p-2">{payloadData}</pre>
-            </div>
-          </ScrollArea>
         </div>
-        <div className="py-4">
-          <PaginatedTable
-            tableHead={<h1>Message Activity</h1>}
-            columns={COLUMNS}
-            data={DATA}
-          />
-        </div>
-      </div>
-    </div>
+      </ScrollArea>
+    </>
   );
 };
 

@@ -10,8 +10,7 @@ import {
   ShoppingCart,
   Users,
 } from "lucide-react";
-
-import { Badge } from "@/components/ui/badge";
+import { headers } from "next/headers";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -32,20 +31,21 @@ import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import NavigationSidebar from "@/components/navigationSidebar";
 import NavigationMenu from "@/components/navigationMenu";
+import DynamicBreadcrumbs from "@/components/breadcrumbs";
 
 const links = [
   {
-    href: "#",
+    href: "/dashboard/applications",
     label: "Applications",
     icon: <Home className="h-5 w-5" />,
   },
   {
-    href: "#",
+    href: "/dashboard/registry",
     label: "Event Registries",
     icon: <ShoppingCart className="h-5 w-5" />,
   },
   {
-    href: "#",
+    href: "/dashboard/credentials",
     label: "Credentials",
     icon: <Package className="h-5 w-5" />,
   },
@@ -66,6 +66,8 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const headerList = headers();
+
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <NavigationSidebar links={links} />
@@ -81,7 +83,8 @@ export default function DashboardLayout({
               <span className="sr-only">Toggle navigation menu</span>
             </Button>
           </NavigationMenu>
-          <div className="w-full flex-1 flex justify-end">
+          <div className="w-full flex-1 flex justify-between items-center">
+            <DynamicBreadcrumbs />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button

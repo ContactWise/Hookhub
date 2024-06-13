@@ -1,6 +1,9 @@
 import PaginatedTable from "@/components/custom/paginatedTable";
 import { Button } from "@/components/ui/button";
 import AddEndpointSheet from "./_components/addEndpointSheet";
+import Typography from "@/components/custom/typography";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import Link from "next/link";
 
 const COLUMNS = [
   {
@@ -60,19 +63,29 @@ const DATA = [
 
 const EndpointsPage = () => {
   const TableHeader = (
-    <div className="flex justify-between">
-      <h2 className="text-lg font-semibold">Endpoints</h2>
-      <AddEndpointSheet />
+    <div className="flex justify-between items-center">
+      <Typography variant={"tableHeading"} className="text-lg">
+        Endpoints
+      </Typography>
+      {/* <AddEndpointSheet /> */}
+      <Link href="/dashboard/application/123/endpoints/create">
+        <Button>Create New Endpoint +</Button>
+      </Link>
     </div>
   );
 
   return (
-    <PaginatedTable
-      paginated
-      tableHead={TableHeader}
-      columns={COLUMNS}
-      data={DATA}
-    />
+    <>
+      <Typography variant={"pageTitle"}>Your Endpoints</Typography>
+      <ScrollArea className="flex flex-1 p-2 justify-center rounded-lg border border-dashed shadow-sm ">
+        <PaginatedTable
+          paginated
+          tableHead={TableHeader}
+          columns={COLUMNS}
+          data={DATA}
+        />
+      </ScrollArea>
+    </>
   );
 };
 

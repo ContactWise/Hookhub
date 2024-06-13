@@ -34,7 +34,7 @@ const AddEventDialog = () => {
     console.log("data", data);
   }
 
-  const trigger = <Button>Open</Button>;
+  const trigger = <Button>Add New Event</Button>;
 
   return (
     <CustomDialog trigger={trigger}>

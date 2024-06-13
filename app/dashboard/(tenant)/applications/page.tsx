@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ApplicationCard, { Application } from "./_components/applicationCard";
+import Typography from "@/components/custom/typography";
 
 const DashboardPage = () => {
   const count: Application[] = [
@@ -23,7 +24,7 @@ const DashboardPage = () => {
   return (
     <div className="flex flex-col items-center w-full">
       <div className="flex w-full justify-between">
-        <h1 className="text-3xl font-semibold">Applications</h1>
+        <Typography variant="pageTitle">Applications</Typography>
         <Button>Create New Application +</Button>
       </div>
       <div className="w-full flex flex-col mt-4 gap-2">

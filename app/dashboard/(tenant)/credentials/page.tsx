@@ -12,6 +12,7 @@ import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import CopyButton from "@/components/custom/copyButton";
+import Typography from "@/components/custom/typography";
 
 interface Credentials {
   id: string;
@@ -97,7 +98,10 @@ const DATA = [
 const CredentialsPage = () => {
   return (
     <div className="flex flex-col items-center w-full">
-      <h1 className="text-4xl font-semibold self-start">Credentials</h1>
+      {/* <h1 className="text-4xl font-semibold self-start">Credentials</h1> */}
+      <Typography className="self-start" variant="pageTitle">
+        Credentials
+      </Typography>
       <div className="flex  w-full mt-4">
         <InputForm
           description="You can generate X more keys"
@@ -108,7 +112,7 @@ const CredentialsPage = () => {
       <PaginatedTable
         tableHead={
           <div className="flex gap-4">
-            <h2 className="text-lg font-semibold">Credentials</h2>
+            <Typography variant={"tableHeading"}>Credentials</Typography>
           </div>
         }
         className="mt-8"

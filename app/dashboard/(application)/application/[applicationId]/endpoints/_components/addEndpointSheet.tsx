@@ -124,7 +124,7 @@ const AddEndpointSheet = () => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button>Create Endpoint</Button>
+        <Button size={"sm"}>Create Endpoint</Button>
       </SheetTrigger>
       <SheetContent className="sm:max-w-[550px]">
         <SheetHeader>

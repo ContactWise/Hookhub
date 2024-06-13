@@ -1,6 +1,8 @@
 import PaginatedTable from "@/components/custom/paginatedTable";
+import Typography from "@/components/custom/typography";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const COLUMNS = [
   {
@@ -93,18 +95,22 @@ const data = [
 
 const MessagesPage = () => {
   return (
-    <div className="w-full">
-      <PaginatedTable
-        columns={COLUMNS}
-        data={data}
-        tableHead={
-          <div className="w-full flex justify-between">
-            <h1 className="text-4xl font-semibold self-start">Messages</h1>
-            <Button size={"default"}>Filters</Button>
-          </div>
-        }
-      />
-    </div>
+    <>
+      <Typography variant={"pageTitle"}>Messages</Typography>
+
+      <ScrollArea className="flex flex-1 p-2 justify-center rounded-lg border border-dashed shadow-sm ">
+        <PaginatedTable
+          columns={COLUMNS}
+          data={data}
+          tableHead={
+            <div className="w-full flex justify-between items-center">
+              <Typography variant={"tableHeading"}>Messages</Typography>
+              <Button size={"sm"}>Filters</Button>
+            </div>
+          }
+        />
+      </ScrollArea>
+    </>
   );
 };
 

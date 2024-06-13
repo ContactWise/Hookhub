@@ -35,6 +35,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import NavigationSidebar from "@/components/navigationSidebar";
 import NavigationMenu from "@/components/navigationMenu";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import Typography from "@/components/custom/typography";
+import DynamicBreadcrumbs from "@/components/breadcrumbs";
 
 const links = [
   {
@@ -79,7 +81,8 @@ export default function DashboardLayout({
               <span className="sr-only">Toggle navigation menu</span>
             </Button>
           </NavigationMenu>
-          <div className="w-full flex-1 flex justify-end">
+          <div className="w-full flex-1 flex justify-between items-center">
+            <DynamicBreadcrumbs />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -103,29 +106,9 @@ export default function DashboardLayout({
           </div>
         </header>
         <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-8 ">
-          <div className="flex gap-4 md:gap-4 flex-col  justify-between items-start ">
-            <div className="flex flex-col w-full md:w-3/4">
-              <h1 className="text-lg font-semibold md:text-2xl">
-                Application Name
-              </h1>
-              <p className="line-clamp-2">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                tincidunt, nunc nec lacinia aliquam, est libero ultricies purus,
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                tincidunt, nunc nec lacinia aliquam, est libero ultricies purus,
-              </p>
-            </div>
-            <div className="flex flex-col gap-2 md:flex-row justify-between w-full">
-              <h3 className="font-semibold text-md md:text-xl  ">
-                Application Url:{" "}
-                <span className="font-normal">https://dummyurl.com</span>
-              </h3>
-              <Badge className="self-start smd:self-auto">Active</Badge>
-            </div>
-          </div>
-          <ScrollArea className="flex flex-1 p-2 justify-center rounded-lg border border-dashed shadow-sm max-h-[450px]">
-            {children}
-          </ScrollArea>
+          {/* <ScrollArea className="flex flex-1 p-2 justify-center rounded-lg border border-dashed shadow-sm "> */}
+          {children}
+          {/* </ScrollArea> */}
         </main>
       </div>
     </div>
