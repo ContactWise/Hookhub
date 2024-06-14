@@ -3,6 +3,8 @@ import Typography from "@/components/custom/typography";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ChevronRight } from "lucide-react";
+import Link from "next/link";
 
 const COLUMNS = [
   {
@@ -25,6 +27,22 @@ const COLUMNS = [
         <Badge variant="success">Success</Badge>
       ) : (
         <Badge variant="destructive">Error</Badge>
+      );
+    },
+  },
+  {
+    name: "actions",
+    label: "Actions",
+    render: (item: any) => {
+      return (
+        <div className="flex gap-2">
+          <Link
+            className="rounded-full bg-secondary p-1"
+            href={`/dashboard/application/141/messages/${item.messageId}`}
+          >
+            <ChevronRight />
+          </Link>
+        </div>
       );
     },
   },

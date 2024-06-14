@@ -14,6 +14,7 @@ import { z } from "zod";
 import CopyButton from "@/components/custom/copyButton";
 import RegistryCard from "./_components/registryCard";
 import Typography from "@/components/custom/typography";
+import CreateRegistrySheet from "./_components/createRegistrySheet";
 
 interface Credentials {
   id: string;
@@ -115,7 +116,10 @@ const CredentialsPage = () => {
     <div className="flex flex-col items-center w-full">
       <div className="flex flex-col gap-2 md:gap-0 md:flex-row w-full justify-between">
         <Typography variant={"pageTitle"}>Event Registries</Typography>
-        <Button size={"default"}>Create New Registry +</Button>
+        {/* <Button size={"default"}>Create New Registry +</Button> */}
+        <CreateRegistrySheet>
+          <Button>Create New Registry +</Button>
+        </CreateRegistrySheet>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full mt-4">
         {REGISTERIES_DATA.map((item, index) => {

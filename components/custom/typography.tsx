@@ -12,7 +12,7 @@ const typographyVariants = cva("transition-colors", {
       tableHeading: "text-lg md:text-md lg:text-lg font-semibold",
       tableText: "text-base md:text-lg lg:text-xl",
       tableDescription: "text-sm md:text-base lg:text-lg",
-      formHeading: "text-3xl md:text-4xl lg:text-5xl",
+      formHeading: "text-xl md:text-xl lg:text-2xl font-semibold",
       formDescription: "text-xl md:text-2xl lg:text-3xl",
       formFieldTitle: "text-lg md:text-xl lg:text-lg font-semibold",
       formFieldDescription: "text-sm md:text-base lg:text-lg",

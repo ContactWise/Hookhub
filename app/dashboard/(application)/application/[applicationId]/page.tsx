@@ -1,7 +1,10 @@
 import PaginatedTable from "@/components/custom/paginatedTable";
 import Typography from "@/components/custom/typography";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ChevronRight } from "lucide-react";
+import Link from "next/link";
 
 const COLUMNS = [
   {
@@ -24,6 +27,22 @@ const COLUMNS = [
         <Badge variant="success">Success</Badge>
       ) : (
         <Badge variant="destructive">Error</Badge>
+      );
+    },
+  },
+  {
+    name: "actions",
+    label: "Actions",
+    render: (item: any) => {
+      return (
+        <div className="flex gap-2">
+          <Link
+            className="rounded-full bg-secondary p-1"
+            href={`/dashboard/application/141/messages/${item.messageId}`}
+          >
+            <ChevronRight />
+          </Link>
+        </div>
       );
     },
   },
@@ -103,7 +122,7 @@ const ApplicationPage = () => {
       <div className="flex gap-4 md:gap-4 flex-col  justify-between items-start ">
         <div className="flex flex-col w-full md:w-3/4">
           <Typography variant={"pageTitle"}>Application Name</Typography>
-          <Typography variant={"pageDescription"} className="line-clamp-2">
+          <Typography variant={"pageDescription"} className="line-clamp-2 mt-1">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
             tincidunt, nunc nec lacinia aliquam, est libero ultricies purus,
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
@@ -112,10 +131,6 @@ const ApplicationPage = () => {
         </div>
 
         <div className="flex flex-col gap-2 md:flex-row justify-between w-full">
-          {/* <h3 className="font-semibold text-md md:text-xl  ">
-            Application Url:{" "}
-            <span className="font-normal">https://dummyurl.com</span>
-          </h3> */}
           <Typography variant={"subTItle"}>
             Application Url:{" "}
             <span className="font-normal">https://dummyurl.com</span>

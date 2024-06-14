@@ -1,9 +1,14 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ApplicationCard, { Application } from "./_components/applicationCard";
 import Typography from "@/components/custom/typography";
+import CreateApplicationSheet from "./_components/createApplicationSheet";
+import { useRouter } from "next/navigation";
 
 const DashboardPage = () => {
+  const router = useRouter();
   const count: Application[] = [
     {
       status: true,
@@ -25,11 +30,20 @@ const DashboardPage = () => {
     <div className="flex flex-col items-center w-full">
       <div className="flex w-full justify-between">
         <Typography variant="pageTitle">Applications</Typography>
-        <Button>Create New Application +</Button>
+        <CreateApplicationSheet>
+          <Button>Create New Application +</Button>
+        </CreateApplicationSheet>
       </div>
       <div className="w-full flex flex-col mt-4 gap-2">
         {count.map((item, index) => {
-          return <ApplicationCard key={index} application={item} />;
+          return (
+            <div
+              key={index}
+              onClick={() => router.push("/dashboard/application/213")}
+            >
+              <ApplicationCard application={item} />
+            </div>
+          );
         })}
       </div>
     </div>

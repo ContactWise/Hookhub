@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import CopyButton from "@/components/custom/copyButton";
 import Typography from "@/components/custom/typography";
+import CreateKeyDialog from "./_components/createKeyDialog";
 
 interface Credentials {
   id: string;
@@ -25,6 +26,10 @@ const HEADERS = [
   {
     name: "id",
     label: "ID",
+  },
+  {
+    name: "name",
+    label: "Name",
   },
   {
     name: "key",
@@ -71,24 +76,28 @@ const HEADERS = [
 const DATA = [
   {
     id: "1",
+    name: "Key 1",
     key: "key des",
     createAt: "2021-09-01",
     expiresAt: "2021-09-01",
   },
   {
     id: "2",
+    name: "Key 2",
     key: "123456789",
     createAt: "2021-09-01",
     expiresAt: "2021-09-01",
   },
   {
     id: "3",
+    name: "Key 3",
     key: "123456789",
     createAt: "2021-09-01",
     expiresAt: "2021-09-01",
   },
   {
     id: "4",
+    name: "Key 4",
     key: "123456789",
     createAt: "2021-09-01",
     expiresAt: "2021-09-01",
@@ -103,11 +112,12 @@ const CredentialsPage = () => {
         Credentials
       </Typography>
       <div className="flex  w-full mt-4">
-        <InputForm
+        {/* <InputForm
           description="You can generate X more keys"
           label="Generate New Key"
           rightIcon={<KeyRound />}
-        />
+        /> */}
+        <CreateKeyDialog />
       </div>
       <PaginatedTable
         tableHead={

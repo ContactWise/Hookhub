@@ -1,16 +1,32 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
+
+type RedirectEntry = {
+  destination: string;
+  permanent: boolean;
+};
+
+const redirects: Record<string, RedirectEntry> = {
+  "/dashboard": {
+    destination: "/dashboard/applications",
+    permanent: true,
+  },
+  "/dashboard/application": {
+    destination: "/dashboard/applications",
+    permanent: true,
+  },
+};
 
 export function middleware(request: NextRequest) {
-  // Add a new header x-current-path which passes the path to downstream components
-  const headers = new Headers(request.headers);
-  headers.set("x-current-path", request.nextUrl.pathname);
-  return NextResponse.next({ headers });
-}
+  const pathname = request.nextUrl.pathname;
+  const redirectData = redirects[pathname];
 
-export const config = {
-  matcher: [
-    // match all routes except static files and APIs
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
-  ],
-};
+  if (redirectData) {
+    const statusCode = redirectData.permanent ? 308 : 307;
+    return NextResponse.redirect(
+      new URL(redirectData.destination, request.url)
+    );
+  }
+
+  // No redirect found, continue without redirecting
+  return NextResponse.next();
+}

@@ -16,8 +16,10 @@ import {
 } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import Typography from "@/components/custom/typography";
+import { toast } from "sonner";
 
-export const formSchema = z.object({
+export const addEventFormSchema = z.object({
   eventName: z.string().min(2, {
     message: "Username must be at least 2 characters.",
   }),
@@ -26,30 +28,42 @@ export const formSchema = z.object({
   }),
 });
 
+type AddEventFormValues = z.infer<typeof addEventFormSchema>;
+
 const AddEventDialog = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<AddEventFormValues>({
+    resolver: zodResolver(addEventFormSchema),
   });
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    console.log("data", data);
-  }
+  const onSubmit = (data: AddEventFormValues) => {
+    return toast(
+      <div>
+        <pre>{JSON.stringify(data, null, 2)}</pre>
+      </div>
+    );
+  };
 
   const trigger = <Button>Add New Event</Button>;
 
   return (
     <CustomDialog trigger={trigger}>
-      <h1 className="font-semibold text-xl">Add New Event</h1>
+      <Typography variant="formHeading">Add New Event</Typography>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-1">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-2 flex flex-col"
+        >
           <FormField
             control={form.control}
             name="eventName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Event Name</FormLabel>
+                <Typography variant={"formFieldTitle"}>Event Name</Typography>
                 <FormControl>
                   <Input placeholder="Event Name..." {...field} />
                 </FormControl>
+                <FormDescription>
+                  lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -59,10 +73,15 @@ const AddEventDialog = () => {
             name="eventDescription"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Event Description</FormLabel>
+                <Typography variant={"formFieldTitle"}>
+                  Event Description
+                </Typography>
                 <FormControl>
                   <Input placeholder="Event Description..." {...field} />
                 </FormControl>
+                <FormDescription>
+                  lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
