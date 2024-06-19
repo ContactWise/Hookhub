@@ -18,6 +18,7 @@ interface BreadcrumbItem {
 
 const DynamicBreadcrumbs = () => {
   const path = usePathname();
+  console.log("path", path);
   const breadcrumbs: BreadcrumbItem[] = path
     .split("/")
     .filter((item) => item)

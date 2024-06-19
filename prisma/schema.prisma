@@ -1,0 +1,138 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id String @id @default(cuid())
+  email String @unique
+  name String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  credentials Credential[]
+  messages Message[]
+  messageActivities MessageActivity[]
+  endpoints Endpoint[]
+  applications Application[]
+  eventRegistries EvenRegistry[]
+  events Event[]
+}
+
+model Tenant {
+  id String @id @default(cuid())
+  name String
+  active Boolean
+}
+
+model Credential {
+  id String @id @default(cuid())
+  user User @relation(fields: [userId], references: [id])
+  userId String
+  name String
+  key String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  createdBy String
+  modifiedAAt DateTime @updatedAt
+  modifiedBy String
+}
+
+model Message {
+  id String @id @default(cuid())
+  recievedAt DateTime
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  tenantId String
+  application Application @relation(fields: [applicationId], references: [id])
+  applicationId String
+  payload String
+
+}
+
+model MessageActivity {
+  id String @id @default(cuid())
+  message Message @relation(fields: [messageId], references: [id])
+  messageId String
+  attempt Int
+  url String
+  statusCode Int
+  status String
+  processedAt DateTime
+  rescheduledAt DateTime
+}
+
+model Endpoint {
+ id String @id @default(cuid())
+ url String
+ headers Json
+ eventRegistry EvenRegistry @relation(fields: [eventRegistryId], references: [id])
+  eventRegistryId String
+  events Event[]
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  tenantId String
+  application Application @relation(fields: [applicationId], references: [id])
+  applicationId String
+  createdAt DateTime @default(now())
+  createdBy String
+  modifiedAAt DateTime @updatedAt
+  modifiedBy String
+}
+
+model Application {
+  id String @id @default(cuid())
+  name String
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  tenantId String
+  status String
+  description String
+  url String  
+  createdAt DateTime @default(now())
+  createdBy String
+  modifiedAAt DateTime @updatedAt
+  modifiedBy String
+  endpoints Endpoint[]
+  messages Message[]
+  messageActivities MessageActivity[]
+  credentials Credential[]
+  eventRegistries EvenRegistry[]
+  events Event[]
+
+}
+
+model EvenRegistry {
+  id String @id @default(cuid())
+  name String
+  description String
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  tenantId String
+  application Application @relation(fields: [applicationId], references: [id])
+  applicationId String
+  createdAt DateTime @default(now())
+  createdBy String
+  modifiedAAt DateTime @updatedAt
+  modifiedBy String
+  endpoints Endpoint[]
+  events Event[]  
+}
+
+model Event {
+id String @id @default(cuid())
+eventRegistry EvenRegistry @relation(fields: [eventRegistryId], references: [id])
+  eventRegistryId String
+  name String
+  description String
+  createdAt DateTime @default(now())
+  createdBy String
+  modifiedAAt DateTime @updatedAt
+  modifiedBy String
+}
