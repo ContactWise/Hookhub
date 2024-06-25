@@ -1,4 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
+import { auth } from "./auth";
 
 type RedirectEntry = {
   destination: string;
@@ -16,17 +17,35 @@ const redirects: Record<string, RedirectEntry> = {
   },
 };
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
+  const session = await auth();
+  console.log("in middleware");
   const pathname = request.nextUrl.pathname;
-  const redirectData = redirects[pathname];
+  console.log("session", session);
+  // Redirect logged-in users trying to visit /auth/signin to /dashboard
+  if (session && pathname === "/auth/signin") {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
 
-  if (redirectData) {
+  // Redirect users without a session trying to access any path other than /auth/signin to /auth/signin
+  if (!session && pathname !== "/auth/signin") {
+    return NextResponse.redirect(new URL("/auth/signin", request.url));
+  }
+
+  // Handle predefined redirects for logged-in users
+  const redirectData = redirects[pathname];
+  if (session?.user && redirectData) {
     const statusCode = redirectData.permanent ? 308 : 307;
     return NextResponse.redirect(
-      new URL(redirectData.destination, request.url)
+      new URL(redirectData.destination, request.url),
+      statusCode
     );
   }
 
-  // No redirect found, continue without redirecting
+  // No redirect necessary, continue with the request
   return NextResponse.next();
 }
+
+export const config = {
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+};

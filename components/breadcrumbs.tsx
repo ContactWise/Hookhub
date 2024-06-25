@@ -7,9 +7,21 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import exp from "constants";
-import React from "react";
+import React, { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import DynamicBreadcrumbsList from "./custom/dynamicBreadcrumbsList";
+import { ChevronDownIcon, ChevronRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { getTenants, getWorkspaces } from "@/queries/getUserDetails";
+import { useEnvironmentContext } from "@/context/envContext";
+import { Tenant } from "@/types";
 
 interface BreadcrumbItem {
   href: string;
@@ -18,27 +30,13 @@ interface BreadcrumbItem {
 
 const DynamicBreadcrumbs = () => {
   const path = usePathname();
-  const breadcrumbs: BreadcrumbItem[] = path
-    .split("/")
-    .filter((item) => item)
-    .map((item, index, arr) => ({
-      href: `/${arr.slice(0, index + 1).join("/")}`,
-      label: item.charAt(0).toUpperCase() + item.slice(1),
-    }));
+  const { tenant, workspace, setTenant, setWorkspace } =
+    useEnvironmentContext();
 
   return (
     <Breadcrumb>
-      <BreadcrumbList>
-        {breadcrumbs.map((breadcrumb, index) => (
-          <React.Fragment key={breadcrumb.href}>
-            <BreadcrumbItem>
-              <BreadcrumbLink className="font-semibold" href={breadcrumb.href}>
-                {breadcrumb.label}
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
-          </React.Fragment>
-        ))}
+      <BreadcrumbList className="font-semibold">
+        <DynamicBreadcrumbsList path={path} separator={<ChevronRight />} />
       </BreadcrumbList>
     </Breadcrumb>
   );

@@ -32,6 +32,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import NavigationSidebar from "@/components/navigationSidebar";
 import NavigationMenu from "@/components/navigationMenu";
 import DynamicBreadcrumbs from "@/components/breadcrumbs";
+import SelectTenantDialog from "@/components/custom/tenantSelectionDialog";
+import NavbarProfile from "@/components/navbarProfile";
 
 const links = [
   {
@@ -85,26 +87,7 @@ export default function DashboardLayout({
           </NavigationMenu>
           <div className="w-full flex-1 flex justify-between items-center">
             <DynamicBreadcrumbs />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="rounded-full"
-                >
-                  <CircleUser className="h-5 w-5" />
-                  <span className="sr-only">Toggle user menu</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Support</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Logout</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <NavbarProfile />
           </div>
         </header>
         <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-8 ">
