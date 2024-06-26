@@ -5,6 +5,17 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { Suspense } from "react";
+import Loading from "./loading";
+import axios from "axios";
+import { QueryClient } from "@tanstack/react-query";
+import { getServiceById } from "@/actions/services";
+import { auth } from "@/auth";
+import { Session } from "next-auth";
+import { ErrorBoundary } from "next/dist/client/components/error-boundary";
+import Error from "./error";
+import ServiceActions from "./_components/serviceActions";
+import { Service } from "@/types";
 
 const COLUMNS = [
   {
@@ -111,38 +122,74 @@ const data = [
   },
 ];
 
-const ApplicationPage = () => {
+const demoService: Service = {
+  id: "1",
+  name: "Demo Service",
+  description: "This is a demo service",
+  isActive: false,
+  metadata: {},
+  createdAt: new Date().toISOString(),
+  lastModifiedAt: new Date().toISOString(),
+  createdBy: "1",
+};
+const ApplicationPage = async ({ params }: any) => {
+  // console.log("props", params.applicationId);
+  const { applicationId } = params;
+  const session: Session = (await auth()) as Session;
+  console.log("session on page", session);
+  const queryClient = new QueryClient();
+
+  // const res = await queryClient.fetchQuery({
+  //   queryKey: ["getService"],
+  //   queryFn: () =>
+  //     getServiceById(
+  //       session!.user!.tenant,
+  //       session!.user!.workspace,
+  //       applicationId
+  //     ),
+  // });
+
   const tableHeader = (
     <div className="flex justify-start">
       <Typography variant="tableHeading">Recent Messages</Typography>
     </div>
   );
   return (
-    <>
-      <div className="flex gap-4 md:gap-4 flex-col  justify-between items-start ">
-        <div className="flex flex-col w-full md:w-3/4">
-          <Typography variant={"pageTitle"}>Application Name</Typography>
-          <Typography variant={"pageDescription"} className="line-clamp-2 mt-1">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-            tincidunt, nunc nec lacinia aliquam, est libero ultricies purus,
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-            tincidunt, nunc nec lacinia aliquam, est libero ultricies purus,
-          </Typography>
-        </div>
+    <Suspense fallback={<Loading />}>
+      <ErrorBoundary fallback={<Error />}>
+        <div className="flex gap-4 md:gap-4 flex-col  justify-between items-start ">
+          <div className="flex flex-col w-full md:w-3/4">
+            <Typography variant={"pageTitle"}>Application Name</Typography>
+            <Typography
+              variant={"pageDescription"}
+              className="line-clamp-2 mt-1"
+            >
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+              tincidunt, nunc nec lacinia aliquam, est libero ultricies purus,
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+              tincidunt, nunc nec lacinia aliquam, est libero ultricies purus,
+            </Typography>
+          </div>
 
-        <div className="flex flex-col gap-2 md:flex-row justify-between w-full">
-          <Typography variant={"subTItle"}>
-            Application Url:{" "}
-            <span className="font-normal">https://dummyurl.com</span>
-          </Typography>
+          <div className="flex flex-col gap-2 md:flex-row justify-between w-full">
+            <Typography variant={"subTItle"}>
+              Application Url:{" "}
+              <span className="font-normal">https://dummyurl.com</span>
+            </Typography>
 
-          <Badge className="self-start smd:self-auto">Active</Badge>
+            {/* <Badge className="self-start smd:self-auto">Active</Badge> */}
+            <ServiceActions service={demoService} />
+          </div>
         </div>
-      </div>
-      <ScrollArea className="flex flex-1 p-2 justify-center rounded-lg border border-dashed shadow-sm ">
-        <PaginatedTable columns={COLUMNS} data={data} tableHead={tableHeader} />
-      </ScrollArea>
-    </>
+        <ScrollArea className="flex flex-1 p-2 justify-center rounded-lg border border-dashed shadow-sm ">
+          <PaginatedTable
+            columns={COLUMNS}
+            data={data}
+            tableHead={tableHeader}
+          />
+        </ScrollArea>
+      </ErrorBoundary>
+    </Suspense>
   );
 };
 

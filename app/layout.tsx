@@ -7,6 +7,7 @@ import { EnvironmentProvider } from "@/context/envContext";
 import ReactQueryWrapper from "@/components/reactQueryWrapper";
 import { QueryClient } from "@tanstack/react-query";
 import { getTenants } from "@/queries/getUserDetails";
+import AuthWrapper from "@/components/sessionProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,18 +23,20 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en" className="">
-      <ReactQueryWrapper>
-        <EnvironmentProvider>
-          <Toaster />
-          {/* <ThemeProvider
+      <AuthWrapper>
+        <ReactQueryWrapper>
+          <EnvironmentProvider>
+            <Toaster />
+            {/* <ThemeProvider
         attribute="class"
         defaultTheme="light"
         enableSystem
         disableTransitionOnChange
       > */}
-          <body className={inter.className}>{children}</body>
-        </EnvironmentProvider>
-      </ReactQueryWrapper>
+            <body className={inter.className}>{children}</body>
+          </EnvironmentProvider>
+        </ReactQueryWrapper>
+      </AuthWrapper>
 
       {/* </ThemeProvider> */}
     </html>

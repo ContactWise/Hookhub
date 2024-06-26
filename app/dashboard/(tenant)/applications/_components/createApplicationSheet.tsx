@@ -46,26 +46,29 @@ import {
 import Typography from "@/components/custom/typography";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { createService } from "@/actions/services";
+import { useEnvironmentContext } from "@/context/envContext";
 
 type ApplicationFormValues = z.infer<typeof applicationFormSchema>;
 const applicationFormSchema = z.object({
   name: z.string().min(3),
   description: z.string().min(10),
-  url: z.string().url(),
+  // url: z.string().url(),
 });
 
 interface CreateApplicationSheetProps {
   children: React.ReactNode;
 }
 
-const CreateApplicationSheet: FC<CreateApplicationSheetProps> = ({
-  children,
-}) => {
+const CreateServiceSheet: FC<CreateApplicationSheetProps> = ({ children }) => {
+  const { tenant, workspace } = useEnvironmentContext();
+
   const form = useForm<ApplicationFormValues>({
     resolver: zodResolver(applicationFormSchema),
     mode: "onChange",
   });
-  const onSubmit = (data: ApplicationFormValues) => {
+  const onSubmit = async (data: ApplicationFormValues) => {
+    const res = await createService(tenant!.id, workspace!.id, data);
     return toast(
       <div>
         <pre>{JSON.stringify(data, null, 2)}</pre>
@@ -131,7 +134,7 @@ const CreateApplicationSheet: FC<CreateApplicationSheetProps> = ({
                 </FormItem>
               )}
             />
-            <FormField
+            {/* <FormField
               control={form.control}
               name="url"
               render={({ field }) => (
@@ -151,9 +154,9 @@ const CreateApplicationSheet: FC<CreateApplicationSheetProps> = ({
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
 
-            <Button type="submit">Create Application</Button>
+            <Button type="submit">Create Service</Button>
           </form>
         </Form>
       </SheetContent>
@@ -161,4 +164,4 @@ const CreateApplicationSheet: FC<CreateApplicationSheetProps> = ({
   );
 };
 
-export default CreateApplicationSheet;
+export default CreateServiceSheet;
