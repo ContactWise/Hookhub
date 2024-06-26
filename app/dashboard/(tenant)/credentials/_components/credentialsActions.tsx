@@ -15,32 +15,39 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Service } from "@/types";
-import { Trash } from "lucide-react";
+import { CredentialResource, Service } from "@/types";
+import { EllipsisVertical, Trash } from "lucide-react";
 import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu";
 import { useEnvironmentContext } from "@/context/envContext";
-import DeleteServiceDialog from "./deleteServiceDialog";
+import DeleteCredentialDailog from "./deleteCredentialsDialog";
+("./deleteCredentialsDialog");
 import { Switch } from "@/components/ui/switch";
-import { setActiveStatus } from "@/actions/services";
+import { setActiveStatus } from "@/actions/credentials";
 import Typography from "@/components/custom/typography";
 import EditServiceSheet from "@/app/dashboard/(tenant)/applications/_components/editServiceSheet";
 
 type Checked = DropdownMenuCheckboxItemProps["checked"];
 
-const ServiceActions = ({ service }: { service: Service }) => {
+const CredentialActions = ({
+  credential,
+}: {
+  credential: CredentialResource;
+}) => {
   const { tenant, workspace } = useEnvironmentContext();
 
-  const [isActive, setIsActive] = React.useState(service.isActive);
+  const [isActive, setIsActive] = React.useState(credential.isActive);
 
   const handleSwitchChange = async (newStatus: boolean) => {
     setIsActive(newStatus);
-    await setActiveStatus(service.id, newStatus, tenant!.id, workspace!.id);
+    await setActiveStatus(tenant!.id, workspace!.id, credential.id, newStatus);
   };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">Actions</Button>
+        <Button variant="ghost">
+          <EllipsisVertical />
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
         <DropdownMenuLabel>
@@ -58,21 +65,18 @@ const ServiceActions = ({ service }: { service: Service }) => {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onSelect={(e) => e.preventDefault()}
-          className="bg-red-300 hover:bg-red-400"
+          className="bg-red-300 hover:bg-red-400 flex items-center"
         >
           <Trash size={14} className="text-red-700" />
-          <DeleteServiceDialog
-            service={service}
+          <DeleteCredentialDailog
+            credential={credential}
             workspace={workspace!}
             tenant={tenant!}
           />
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-          <EditServiceSheet serviceId={service.id} />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
 };
 
-export default ServiceActions;
+export default CredentialActions;

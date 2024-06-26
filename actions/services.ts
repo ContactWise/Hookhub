@@ -2,9 +2,13 @@
 
 import axios from "@/queries/axiosInstance";
 import { serviceRequestSchema } from "@/schemas/service";
+import { ApiResponse, Service } from "@/types";
 import { z } from "zod";
 
-const getServices = async (tenantId: string, workspaceId: string) => {
+const getServices = async (
+  tenantId: string,
+  workspaceId: string
+): Promise<ApiResponse<Service[]>> => {
   try {
     console.log("tenantId", tenantId);
     console.log("workspaceId", workspaceId);
@@ -21,7 +25,7 @@ const getServiceById = async (
   tenantId: string,
   workspaceId: string,
   serviceId: string
-) => {
+): Promise<ApiResponse<Service>> => {
   try {
     console.log({ tenantId, workspaceId, serviceId });
     const { data } = await axios.get(

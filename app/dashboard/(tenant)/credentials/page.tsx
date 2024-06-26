@@ -14,13 +14,13 @@ import { z } from "zod";
 import CopyButton from "@/components/custom/copyButton";
 import Typography from "@/components/custom/typography";
 import CreateKeyDialog from "./_components/createKeyDialog";
-
-interface Credentials {
-  id: string;
-  key: string;
-  createAt: string;
-  expiresAt: string;
-}
+import { useEnvironmentContext } from "@/context/envContext";
+import { QueryClient, useQuery } from "@tanstack/react-query";
+import { getCredentials } from "@/actions/credentials";
+import { Session } from "next-auth";
+import { auth } from "@/auth";
+import { CredentialResource } from "@/types";
+import CredentialActions from "./_components/credentialsActions";
 
 const HEADERS = [
   {
@@ -32,13 +32,13 @@ const HEADERS = [
     label: "Name",
   },
   {
-    name: "key",
-    label: "Key",
+    name: "apiKey",
+    label: "API Key",
     render: (item: any) => {
       return (
         <span className="flex items-center">
-          {`****${item.key.slice(-4)}`}
-          <CopyButton variant={"ghost"} value={item.key}>
+          {`****${item.apiKey.slice(-4)}`}
+          <CopyButton variant={"ghost"} value={item.apiKey}>
             <Copy className="text-muted-foreground" size={16} />
           </CopyButton>
         </span>
@@ -46,77 +46,41 @@ const HEADERS = [
     },
   },
   {
-    name: "createAt",
-    label: "Create At",
+    name: "createdAt",
+    label: "Created At",
+    render: (item: any) => (
+      <span>{new Date(item.createdAt).toLocaleDateString()}</span>
+    ),
   },
-  {
-    name: "expiresAt",
-    label: "Expires At",
-  },
+  // {
+  //   name: "expiresAt",
+  //   label: "Expires At",
+  // },
   {
     name: "actions",
     label: "Actions",
-    render: (item: any) => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button aria-haspopup="true" size="icon" variant="ghost">
-            <MoreHorizontal className="h-4 w-4" />
-            <span className="sr-only">Toggle menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem>Revoke</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
+    render: (item: any) => <CredentialActions credential={item} />,
   },
 ];
 
-const DATA = [
-  {
-    id: "1",
-    name: "Key 1",
-    key: "key des",
-    createAt: "2021-09-01",
-    expiresAt: "2021-09-01",
-  },
-  {
-    id: "2",
-    name: "Key 2",
-    key: "123456789",
-    createAt: "2021-09-01",
-    expiresAt: "2021-09-01",
-  },
-  {
-    id: "3",
-    name: "Key 3",
-    key: "123456789",
-    createAt: "2021-09-01",
-    expiresAt: "2021-09-01",
-  },
-  {
-    id: "4",
-    name: "Key 4",
-    key: "123456789",
-    createAt: "2021-09-01",
-    expiresAt: "2021-09-01",
-  },
-];
+const CredentialsPage = async () => {
+  const session: Session = (await auth()) as Session;
+  const queryClient = new QueryClient();
 
-const CredentialsPage = () => {
+  const res = await queryClient.fetchQuery({
+    queryKey: ["getService"],
+    queryFn: () =>
+      getCredentials(session!.user!.tenant, session!.user!.workspace),
+  });
+
+  console.log("resforcreds", res);
+
   return (
     <div className="flex flex-col items-center w-full">
-      {/* <h1 className="text-4xl font-semibold self-start">Credentials</h1> */}
       <Typography className="self-start" variant="pageTitle">
         Credentials
       </Typography>
       <div className="flex  w-full mt-4">
-        {/* <InputForm
-          description="You can generate X more keys"
-          label="Generate New Key"
-          rightIcon={<KeyRound />}
-        /> */}
         <CreateKeyDialog />
       </div>
       <PaginatedTable
@@ -127,7 +91,7 @@ const CredentialsPage = () => {
         }
         className="mt-8"
         columns={HEADERS}
-        data={DATA}
+        data={res.data}
       />
     </div>
   );

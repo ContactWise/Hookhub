@@ -126,7 +126,7 @@ const demoService: Service = {
   id: "1",
   name: "Demo Service",
   description: "This is a demo service",
-  isActive: false,
+  isActive: true,
   metadata: {},
   createdAt: new Date().toISOString(),
   lastModifiedAt: new Date().toISOString(),

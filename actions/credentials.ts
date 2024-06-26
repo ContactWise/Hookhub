@@ -61,7 +61,7 @@ const setActiveStatus = async (
   const baseUrl = `/api/v1/${tenantId}/workspaces/${workspaceId}/credentials/${credentialId}`;
   const url = `${baseUrl}/${status ? "activate" : "deactivate"}`;
   try {
-    const res = await axios.put(url);
+    const res = await axios.patch(url);
     return res.data;
   } catch (error) {
     throw new Error("Error: Failed to update credential status.");

@@ -30,4 +30,24 @@ interface Service {
   lastModifiedAt: string;
 }
 
-export { Tenant, Workspace, Service };
+interface CredentialResource {
+  name: string;
+  description: string;
+  apiKey: string;
+  isActive: boolean;
+  id: string;
+  createdAt: string;
+  createdBy: string;
+  lastModifiedAt: string;
+}
+
+interface ApiResponse<T> {
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+  };
+  data: T;
+}
+
+export { Tenant, Workspace, Service, CredentialResource, ApiResponse };

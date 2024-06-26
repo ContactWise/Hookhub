@@ -47,8 +47,8 @@ const DashboardPage = () => {
       <div className="w-full flex flex-col mt-4 gap-2 h-full">
         {isLoading ? (
           <Typography>Loading...</Typography>
-        ) : isFetched && data?.data.length > 0 ? (
-          data.data.map((item: Service, index: number) => {
+        ) : isFetched && data!.data.length > 0 ? (
+          data!.data.map((item: Service, index: number) => {
             return (
               <div key={index}>
                 <ApplicationCard application={item} />
