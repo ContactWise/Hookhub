@@ -24,15 +24,14 @@ const NavigationSidebar: FC<NavigationSidebarProps> = ({ links }) => {
           <nav className="grid items-start gap-2 px-2 text-sm font-medium lg:px-4">
             <WorkspaceSelect className="w-full mb-4" />
             {links.map((link) => (
-              <div
-                onClick={() => router.push(`${pathName}${link.href}`)}
-                // href={link.href}
+              <Link
+                href={link.href}
                 key={link.label}
                 className="flex items-center gap-3 rounded-lg px-3 py-3 text-muted-foreground transition-all hover:text-primary hover:bg-secondary"
               >
                 {link.icon}
                 {link.label}
-              </div>
+              </Link>
             ))}
           </nav>
         </div>

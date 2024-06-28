@@ -70,7 +70,29 @@ export default function DashboardLayout({
   children: React.ReactNode;
   params: any;
 }) {
-  console.log("params in layout ", params);
+  const { applicationId } = params;
+  const links = [
+    {
+      href: `/dashboard/application/${applicationId}/`,
+      label: "Home",
+      icon: <Home className="h-5 w-5" />,
+    },
+    {
+      href: `/dashboard/application/${applicationId}/endpoints`,
+      label: "Endpoints",
+      icon: <Link className="h-5 w-5" />,
+    },
+    {
+      href: `/dashboard/application/${applicationId}/messages`,
+      label: "Messages",
+      icon: <Mails className="h-5 w-5" />,
+    },
+    {
+      href: `/dashboard/application/${applicationId}/analytics`,
+      label: "Analytics",
+      icon: <LineChart className="h-5 w-5" />,
+    },
+  ];
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <NavigationSidebar links={links} />
