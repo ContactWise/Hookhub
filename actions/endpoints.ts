@@ -31,9 +31,7 @@ const createEndpoint = async (
   try {
     const res = await axios.post(
       `/api/v1/${tenantId}/workspaces/${workspaceId}/services/${serviceId}/endpoints`,
-      {
-        data,
-      }
+      data
     );
     console.log("res", res);
     return res.data;
@@ -42,5 +40,27 @@ const createEndpoint = async (
     throw new Error("Error: Failed to create endpoint.");
   }
 };
+// const createEndpoint = async (
+//   tenantId: string,
+//   workspaceId: string,
+//   serviceId: string,
+//   formData: z.infer<typeof endpointRequestSchema>
+// ) => {
+//   const data = endpointRequestSchema.parse(formData);
+//   console.log("datafor", { data });
+//   try {
+//     const res = await axios.post(
+//       `/api/v1/${tenantId}/workspaces/${workspaceId}/services/${serviceId}/endpoints`,
+//       {
+//         data,
+//       }
+//     );
+//     console.log("res", res);
+//     return res.data;
+//   } catch (error) {
+//     console.log("error", error);
+//     throw new Error("Error: Failed to create endpoint.");
+//   }
+// };
 
 export { getEndpoints, createEndpoint };

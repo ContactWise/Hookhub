@@ -33,40 +33,40 @@ const DashboardPage = () => {
 
   return (
     <div className="flex flex-col items-center w-full h-full">
-      <ErrorBoundary fallback={<Error />}>
-        <div className="flex w-full justify-between">
-          <Typography variant="pageTitle">Services</Typography>
-          <CreateApplicationSheet>
-            <Button>Create New Service +</Button>
-          </CreateApplicationSheet>
-        </div>
-        <div className="w-full flex flex-col mt-4 gap-2 h-full">
-          <Suspense fallback={<Loading />}>
-            {isLoading || !isFetched ? (
-              <div className="w-full flex-1 flex flex-col justify-center items-center">
-                <LoadingDots />
-                {/* <Typography variant={"pageDescription"}>Loading...</Typography> */}
-              </div>
-            ) : isFetched && data!.data.length > 0 ? (
-              data!.data.map((item: Service, index: number) => {
-                return (
-                  <div key={index}>
-                    <ApplicationCard application={item} />
-                  </div>
-                );
-              })
-            ) : (
-              <div className="flex flex-col justify-center items-center w-full flex-1 border-dashed bordermu border-2 rounded-lg">
-                <Typography variant="subTItle">No services created</Typography>
-                <Typography variant="pageDescription">
-                  Start by creating a new service
-                </Typography>
-              </div>
-            )}
-            {error && <Typography>Error loading services</Typography>}
-          </Suspense>
-        </div>
-      </ErrorBoundary>
+      {/* <ErrorBoundary fallback={<Error />}> */}
+      <div className="flex w-full justify-between">
+        <Typography variant="pageTitle">Services</Typography>
+        <CreateApplicationSheet>
+          <Button>Create New Service +</Button>
+        </CreateApplicationSheet>
+      </div>
+      <div className="w-full flex flex-col mt-4 gap-2 h-full">
+        <Suspense fallback={<Loading />}>
+          {isLoading || !isFetched ? (
+            <div className="w-full flex-1 flex flex-col justify-center items-center">
+              <LoadingDots />
+              {/* <Typography variant={"pageDescription"}>Loading...</Typography> */}
+            </div>
+          ) : isFetched && data!.data.length > 0 ? (
+            data!.data.map((item: Service, index: number) => {
+              return (
+                <div key={index}>
+                  <ApplicationCard application={item} />
+                </div>
+              );
+            })
+          ) : (
+            <div className="flex flex-col justify-center items-center w-full flex-1 border-dashed bordermu border-2 rounded-lg">
+              <Typography variant="subTItle">No services created</Typography>
+              <Typography variant="pageDescription">
+                Start by creating a new service
+              </Typography>
+            </div>
+          )}
+          {error && <Typography>Error loading services</Typography>}
+        </Suspense>
+      </div>
+      {/* </ErrorBoundary> */}
     </div>
   );
 };

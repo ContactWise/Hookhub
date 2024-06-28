@@ -73,8 +73,6 @@ const CredentialsPage = async () => {
       getCredentials(session!.user!.tenant, session!.user!.workspace),
   });
 
-  console.log("resforcreds", res);
-
   return (
     <div className="flex flex-col items-center w-full">
       <Typography className="self-start" variant="pageTitle">
