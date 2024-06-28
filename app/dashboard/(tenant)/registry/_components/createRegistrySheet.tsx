@@ -46,6 +46,14 @@ import {
 import Typography from "@/components/custom/typography";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import {
+  QueryClient,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { createCredential } from "@/actions/credentials";
+import { createEventRegistry } from "@/actions/eventRegistries";
+import { useEnvironmentContext } from "@/context/envContext";
 
 interface CreateRegistrySheetProps {
   children: React.ReactNode;
@@ -58,18 +66,42 @@ const eventRegistryFormSchema = z.object({
 type EventRegistryFormValues = z.infer<typeof eventRegistryFormSchema>;
 
 const CreateRegistrySheet: FC<CreateRegistrySheetProps> = ({ children }) => {
+  const { workspace, tenant } = useEnvironmentContext();
   const form = useForm<EventRegistryFormValues>({
     resolver: zodResolver(eventRegistryFormSchema),
-    mode: "onChange",
+    mode: "onBlur",
+  });
+  const queryClient = useQueryClient();
+  const { mutateAsync } = useMutation({
+    mutationFn: ({
+      tenantId,
+      workspaceId,
+      formData,
+    }: {
+      tenantId: string;
+      workspaceId: string;
+      formData: z.infer<typeof eventRegistryFormSchema>;
+    }) => createEventRegistry(tenantId, workspaceId, formData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["getRegistries"] });
+    },
   });
 
   const onSubmit = (data: EventRegistryFormValues) => {
-    return toast(
-      <div>
-        <pre>{JSON.stringify(data, null, 2)}</pre>
-      </div>
+    return toast.promise(
+      mutateAsync({
+        tenantId: tenant!.id,
+        workspaceId: workspace!.id,
+        formData: data,
+      }),
+      {
+        loading: "Creating Event Registry...",
+        success: "Event Registry created successfully",
+        error: "Failed to create Event Registry",
+      }
     );
   };
+
   return (
     <Sheet>
       <SheetTrigger asChild>{children}</SheetTrigger>
@@ -91,12 +123,10 @@ const CreateRegistrySheet: FC<CreateRegistrySheetProps> = ({ children }) => {
                 <FormItem>
                   <FormLabel>
                     {" "}
-                    <Typography variant={"formFieldTitle"}>
-                      Registry Name
-                    </Typography>
+                    <Typography variant={"formFieldTitle"}>Name</Typography>
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="Application name..." {...field} />
+                    <Input placeholder="Registry name..." {...field} />
                   </FormControl>
                   <FormDescription>
                     lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -113,12 +143,12 @@ const CreateRegistrySheet: FC<CreateRegistrySheetProps> = ({ children }) => {
                   <FormLabel>
                     {" "}
                     <Typography variant={"formFieldTitle"}>
-                      Registry Description
+                      Description
                     </Typography>
                   </FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Application Description..."
+                      placeholder="Registry Description..."
                       className="resize-none"
                       {...field}
                     />

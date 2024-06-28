@@ -4,6 +4,15 @@ import AddEndpointSheet from "./_components/addEndpointSheet";
 import Typography from "@/components/custom/typography";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from "next/link";
+import {
+  HydrationBoundary,
+  QueryClient,
+  dehydrate,
+} from "@tanstack/react-query";
+import { getEndpoints } from "@/actions/endpoints";
+import { auth } from "@/auth";
+import { Session } from "next-auth";
+import EndpointsTable from "./_components/endpointsTable";
 
 const COLUMNS = [
   {
@@ -61,29 +70,35 @@ const DATA = [
   },
 ];
 
-const EndpointsPage = () => {
-  const TableHeader = (
-    <div className="flex justify-between items-center">
-      <Typography variant={"tableHeading"} className="text-lg">
-        Endpoints
-      </Typography>
-      {/* <AddEndpointSheet /> */}
-      <Link href="/dashboard/application/123/endpoints/create">
-        <Button>Create New Endpoint +</Button>
-      </Link>
-    </div>
-  );
+const queryClient = new QueryClient();
 
+const EndpointsPage = async ({ params }: any) => {
+  const { applicationId } = params;
+  const session: Session = (await auth()) as Session;
+  console.log("applicationId", applicationId);
+  await queryClient.prefetchQuery({
+    queryKey: ["getEndpoints"],
+    queryFn: () =>
+      getEndpoints(
+        session!.user!.tenant,
+        session!.user!.workspace,
+        applicationId
+      ),
+  });
+  // console.log("Res", res);
   return (
     <>
       <Typography variant={"pageTitle"}>Your Endpoints</Typography>
       <ScrollArea className="flex flex-1 p-2 justify-center rounded-lg border border-dashed shadow-sm ">
-        <PaginatedTable
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <EndpointsTable serviceId={applicationId} />
+        </HydrationBoundary>
+        {/* <PaginatedTable
           paginated
           tableHead={TableHeader}
           columns={COLUMNS}
           data={DATA}
-        />
+        /> */}
       </ScrollArea>
     </>
   );

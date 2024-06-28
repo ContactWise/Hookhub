@@ -20,6 +20,13 @@ import {
 } from "@/components/ui/table";
 import PaginatedTable from "@/components/custom/paginatedTable";
 import AddEventDialog from "./_components/addEventDialog";
+import { Session } from "next-auth";
+import { auth } from "@/auth";
+import { QueryClient } from "@tanstack/react-query";
+import { getEventRegistryById, getEvents } from "@/actions/eventRegistries";
+import DeleteEventDialog from "./_components/deleteEventDialog";
+import RegistryActions from "./_components/registryActions";
+import Typography from "@/components/custom/typography";
 
 const COLUMNS = [
   {
@@ -31,47 +38,54 @@ const COLUMNS = [
     label: "Name",
   },
   {
-    name: "description",
-    label: "Description",
+    name: "actions",
+    label: "Actions",
+    render: (item: any) => {
+      return (
+        <DeleteEventDialog
+          eventRegistryId={item.eventRegistryId}
+          eventName={item.name}
+        />
+      );
+    },
   },
 ];
 
-const DATA = [
-  {
-    id: "1",
-    name: "Event 1",
-    description: "Event 1 Description",
-  },
-  {
-    id: "2",
-    name: "Event 2",
-    description: "Event 2 Description",
-  },
-  {
-    id: "3",
-    name: "Event 3",
-    description: "Event 3 Description",
-  },
-  {
-    id: "4",
-    name: "Event 4",
-    description: "Event 4 Description",
-  },
-];
+const RegistryPage = async ({ params }: any) => {
+  const { registryId } = params;
+  const session: Session = (await auth()) as Session;
+  const queryClient = new QueryClient();
 
-const RegistryPage = () => {
+  const registryRes = await queryClient.fetchQuery({
+    queryKey: ["getEventRegistry", registryId],
+    queryFn: () =>
+      getEventRegistryById(
+        session!.user!.tenant,
+        session!.user!.workspace,
+        registryId
+      ),
+  });
+
+  const eventsRes = await queryClient.fetchQuery({
+    queryKey: ["getEvents"],
+    queryFn: () =>
+      getEvents(session!.user!.tenant, session!.user!.workspace, registryId),
+  });
+
   return (
     <div className="flex flex-col  w-full">
-      <div className="flex flex-col w-full md:w-3/4">
-        <h1 className="text-lg font-semibold md:text-2xl">
-          Event Registry Name
-        </h1>
-        <p className="line-clamp-2">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-          tincidunt, nunc nec lacinia aliquam, est libero ultricies purus, Lorem
-          ipsum dolor sit amet, consectetur adipiscing elit. Sed tincidunt, nunc
-          nec lacinia aliquam, est libero ultricies purus,
-        </p>
+      <div className="flex gap-4 md:gap-4   justify-between items-end ">
+        <div className="flex flex-col w-full md:w-3/4">
+          <Typography variant={"pageTitle"}>{registryRes.name}</Typography>
+          <Typography variant={"pageDescription"} className="line-clamp-2 mt-1">
+            {registryRes.description}{" "}
+          </Typography>
+        </div>
+
+        <div className="flex flex-col gap-2 md:flex-row justify-end w-full">
+          {/* <Badge className="self-start smd:self-auto">Active</Badge> */}
+          <RegistryActions registry={registryRes} />
+        </div>
       </div>
       <div>
         <div className="flex flex-row items-center mt-4">
@@ -89,11 +103,17 @@ const RegistryPage = () => {
                 {/* <Button className="bg-foreground" size="sm">
                   Add New Event+
                 </Button> */}
-                <AddEventDialog />
+                <AddEventDialog eventRegistryId={registryRes.id} />
               </div>
             }
             columns={COLUMNS}
-            data={DATA}
+            data={eventsRes.map((event, index) => {
+              return {
+                id: index + 1,
+                name: event,
+                eventRegistryId: registryId,
+              };
+            })}
           />
         </div>
       </div>

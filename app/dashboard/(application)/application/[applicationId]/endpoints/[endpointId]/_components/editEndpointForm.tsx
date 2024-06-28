@@ -181,7 +181,7 @@ const EditEndpointForm = () => {
                       </TableHeader>
                       <TableBody>
                         {fields.map((field, index) => (
-                          <TableRow key={index}>
+                          <TableRow key={field.id}>
                             <TableCell>
                               <FormField
                                 control={form.control}

@@ -46,30 +46,58 @@ import {
 import Typography from "@/components/custom/typography";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { createService } from "@/actions/services";
+import { useEnvironmentContext } from "@/context/envContext";
+import { QueryClient, useMutation } from "@tanstack/react-query";
 
 type ApplicationFormValues = z.infer<typeof applicationFormSchema>;
 const applicationFormSchema = z.object({
   name: z.string().min(3),
   description: z.string().min(10),
-  url: z.string().url(),
 });
 
 interface CreateApplicationSheetProps {
   children: React.ReactNode;
 }
 
-const CreateApplicationSheet: FC<CreateApplicationSheetProps> = ({
-  children,
-}) => {
+const CreateServiceSheet: FC<CreateApplicationSheetProps> = ({ children }) => {
+  const { tenant, workspace } = useEnvironmentContext();
+  const queryClient = new QueryClient();
+
   const form = useForm<ApplicationFormValues>({
     resolver: zodResolver(applicationFormSchema),
-    mode: "onChange",
+    mode: "onSubmit",
   });
-  const onSubmit = (data: ApplicationFormValues) => {
-    return toast(
-      <div>
-        <pre>{JSON.stringify(data, null, 2)}</pre>
-      </div>
+
+  const { mutateAsync } = useMutation({
+    mutationFn: ({
+      tenantId,
+      workspaceId,
+      formData,
+    }: {
+      tenantId: string;
+      workspaceId: string;
+      formData: z.infer<typeof applicationFormSchema>;
+    }) => createService(tenantId, workspaceId, formData),
+    onSuccess: async () => {
+      form.reset();
+      await queryClient.invalidateQueries({ queryKey: ["getServices"] });
+      console.log("item created successfully");
+    },
+  });
+
+  const onSubmit = async (data: ApplicationFormValues) => {
+    return toast.promise(
+      mutateAsync({
+        tenantId: tenant!.id,
+        workspaceId: workspace!.id,
+        formData: data,
+      }),
+      {
+        loading: "Creating Service...",
+        success: "Service created successfully",
+        error: "Failed to create Service",
+      }
     );
   };
 
@@ -131,7 +159,7 @@ const CreateApplicationSheet: FC<CreateApplicationSheetProps> = ({
                 </FormItem>
               )}
             />
-            <FormField
+            {/* <FormField
               control={form.control}
               name="url"
               render={({ field }) => (
@@ -151,9 +179,9 @@ const CreateApplicationSheet: FC<CreateApplicationSheetProps> = ({
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
 
-            <Button type="submit">Create Application</Button>
+            <Button type="submit">Create Service</Button>
           </form>
         </Form>
       </SheetContent>
@@ -161,4 +189,4 @@ const CreateApplicationSheet: FC<CreateApplicationSheetProps> = ({
   );
 };
 
-export default CreateApplicationSheet;
+export default CreateServiceSheet;

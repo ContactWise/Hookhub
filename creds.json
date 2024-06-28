@@ -1,0 +1,25 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "John Doe",
+      "email": "john.doe@gmail.com",
+      "password": "1234561151",
+      "role": "tenant_admin"
+    },
+    {
+      "id": 2,
+      "name": "Jane Doe",
+      "email": "jane.doe@gmail.com",
+      "password": "123456789",
+      "role": "admin"
+    },
+    {
+      "id": 3,
+      "name": "Dave Smith",
+      "email": "dave@davesmith.com",
+      "password": "1234560987",
+      "role": "user"
+    }
+  ]
+}

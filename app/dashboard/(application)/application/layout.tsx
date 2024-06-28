@@ -37,6 +37,8 @@ import NavigationMenu from "@/components/navigationMenu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Typography from "@/components/custom/typography";
 import DynamicBreadcrumbs from "@/components/breadcrumbs";
+import SelectTenantDialog from "@/components/custom/tenantSelectionDialog";
+import NavbarProfile from "@/components/navbarProfile";
 
 const links = [
   {
@@ -45,7 +47,7 @@ const links = [
     icon: <Home className="h-5 w-5" />,
   },
   {
-    href: "/dashboard/application/123/endpoints",
+    href: "/endpoints",
     label: "Endpoints",
     icon: <Link className="h-5 w-5" />,
   },
@@ -63,9 +65,12 @@ const links = [
 
 export default function DashboardLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: any;
 }) {
+  console.log("params in layout ", params);
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <NavigationSidebar links={links} />
@@ -83,26 +88,7 @@ export default function DashboardLayout({
           </NavigationMenu>
           <div className="w-full flex-1 flex justify-between items-center">
             <DynamicBreadcrumbs />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="rounded-full"
-                >
-                  <CircleUser className="h-5 w-5" />
-                  <span className="sr-only">Toggle user menu</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Support</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Logout</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <NavbarProfile />
           </div>
         </header>
         <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-8 ">
