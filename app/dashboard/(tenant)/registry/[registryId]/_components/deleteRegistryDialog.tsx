@@ -26,6 +26,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { deleteCredential } from "@/actions/credentials";
 import { deleteEvent, deleteEventRegistry } from "@/actions/eventRegistries";
+import { useRouter } from "next/navigation";
 
 interface deleteCredentialInput {
   tenantId: string;
@@ -41,6 +42,7 @@ const DeleteRegistryDialog = ({
   workspaceId: string;
   tenantId: string;
 }) => {
+  const router = useRouter();
   const { mutateAsync } = useMutation({
     mutationFn: (values: deleteCredentialInput) =>
       deleteEventRegistry(
@@ -48,6 +50,9 @@ const DeleteRegistryDialog = ({
         values.workspaceId,
         values.eventRegistryId
       ),
+    onSuccess: () => {
+      router.push("/dashboard/registry");
+    },
   });
 
   const handleDelete = () => {

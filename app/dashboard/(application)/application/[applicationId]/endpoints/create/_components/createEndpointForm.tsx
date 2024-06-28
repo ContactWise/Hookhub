@@ -32,16 +32,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Typography from "@/components/custom/typography";
 import { MultiSelect } from "@/components/multiselect";
 import { toast } from "sonner";
+import { Textarea } from "@/components/ui/textarea";
+import { PasswordInput } from "@/components/custom/passwordInput";
+import { Minus } from "lucide-react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { getEventRegistries, getEvents } from "@/actions/eventRegistries";
+import { useEnvironmentContext } from "@/context/envContext";
+import { EventRegistryResource } from "@/types";
+import { endpointRequestSchema } from "@/schemas/endpoint";
+import { createEndpoint } from "@/actions/endpoints";
 // import { Textarea } from "@/components/ui/textarea";
 // import { toast } from "@/components/ui/use-toast";
-const CreateEndpointForm = () => {
+const CreateEndpointForm = ({ serviceId }: { serviceId: string }) => {
+  const { tenant, workspace } = useEnvironmentContext();
+
   const endpointFormSchema = z.object({
     name: z.string(),
+    description: z.string(),
     url: z.string().url(),
+    secret: z.string(),
+    subject: z.string(),
     headers: z.array(
       z
         .object({
@@ -51,7 +65,7 @@ const CreateEndpointForm = () => {
         .optional()
     ),
 
-    eventRegistry: z.string({
+    eventRegistryId: z.string({
       message: "Event Registry is required",
     }),
     events: z.array(z.string()),
@@ -65,15 +79,78 @@ const CreateEndpointForm = () => {
 
   const form = useForm<EndpointFormValues>({
     resolver: zodResolver(endpointFormSchema),
-    mode: "onChange",
+    mode: "onSubmit",
   });
 
-  const { fields, append } = useFieldArray({
+  const eventRegistryValue = form.watch("eventRegistryId");
+  const { fields, append, remove } = useFieldArray({
     name: "headers",
     control: form.control,
   });
 
+  const {
+    data: registryData,
+    error,
+    isFetching: isRegistryDataFetching,
+    isSuccess: isRegistryDataSuccess,
+  } = useQuery({
+    queryKey: ["getRegistries"],
+    queryFn: () => getEventRegistries(tenant!.id, workspace!.id),
+  });
+
+  const {
+    data: eventsData,
+    isSuccess: isEventsDataSuccess,
+    isFetching,
+  } = useQuery({
+    queryKey: ["getEvents", eventRegistryValue],
+    queryFn: () => getEvents(tenant!.id, workspace!.id, eventRegistryValue),
+    enabled: !!eventRegistryValue,
+  });
+
+  const { mutateAsync } = useMutation({
+    mutationFn: ({
+      tenantId,
+      workspaceId,
+      serviceId,
+      formData,
+    }: {
+      tenantId: string;
+      workspaceId: string;
+      serviceId: string;
+      formData: z.infer<typeof endpointRequestSchema>;
+    }) => createEndpoint(tenantId, workspaceId, serviceId, formData),
+  });
+
   function onSubmit(data: EndpointFormValues) {
+    return toast.promise(
+      mutateAsync({
+        tenantId: tenant!.id,
+        workspaceId: workspace!.id,
+        serviceId: serviceId,
+        formData: {
+          ...data,
+          serviceId: serviceId,
+          isActive: true,
+          method: 0,
+          workspaceId: workspace!.id,
+          tenantId: tenant!.id,
+          source: "postman",
+          headers: Object.fromEntries(
+            data.headers
+              .filter(
+                (h): h is { key: string; value: string } => h !== undefined
+              )
+              .map((h) => [h.key, h.value])
+          ),
+        },
+      }),
+      {
+        loading: "Creating Endpoint...",
+        success: "Endpoint Created Successfully",
+        error: "Failed to create Endpoint",
+      }
+    );
     return toast(
       <div>
         <pre>{JSON.stringify(data, null, 2)}</pre>
@@ -82,6 +159,10 @@ const CreateEndpointForm = () => {
   }
 
   const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
+  useEffect(() => {
+    // form.resetField("events");
+    setSelectedEvents([]);
+  }, [eventRegistryValue]);
 
   type EndpointFormValues = z.infer<typeof endpointFormSchema>;
 
@@ -114,6 +195,31 @@ const CreateEndpointForm = () => {
         />
         <FormField
           control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                {" "}
+                <Typography variant={"formFieldTitle"}>
+                  Endpoint Description
+                </Typography>
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Endpoint Description..."
+                  className="resize-none"
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>
+                lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="url"
           render={({ field }) => (
             <FormItem>
@@ -123,6 +229,48 @@ const CreateEndpointForm = () => {
               </FormLabel>
               <FormControl>
                 <Input placeholder="Endpoint URL..." {...field} />
+              </FormControl>
+              <FormDescription>
+                lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="subject"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                {" "}
+                <Typography variant={"formFieldTitle"}>
+                  Endpoint Subject
+                </Typography>
+              </FormLabel>
+              <FormControl>
+                <Input placeholder="Endpoint subject..." {...field} />
+              </FormControl>
+              <FormDescription>
+                lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="secret"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                {" "}
+                <Typography variant={"formFieldTitle"}>
+                  Endpoint Secret
+                </Typography>
+              </FormLabel>
+              <FormControl>
+                <PasswordInput placeholder="Endpoint secret..." {...field} />
               </FormControl>
               <FormDescription>
                 lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -153,7 +301,7 @@ const CreateEndpointForm = () => {
             </TableHeader>
             <TableBody>
               {fields.map((field, index) => (
-                <TableRow key={index}>
+                <TableRow key={field.id}>
                   <TableCell>
                     <FormField
                       control={form.control}
@@ -182,6 +330,15 @@ const CreateEndpointForm = () => {
                       )}
                     />
                   </TableCell>
+                  <TableCell>
+                    <Button
+                      variant={"outline"}
+                      size="icon"
+                      onClick={() => remove(index)}
+                    >
+                      <Minus />
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -189,7 +346,7 @@ const CreateEndpointForm = () => {
         </div>
         <FormField
           control={form.control}
-          name="eventRegistry"
+          name="eventRegistryId"
           render={({ field }) => (
             <FormItem>
               <Typography variant={"formFieldTitle"}>
@@ -202,11 +359,27 @@ const CreateEndpointForm = () => {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="sms_registry">SMS Registry</SelectItem>
-
-                  <SelectItem value="whatsapp_registry">
-                    Whatsapp Registry
-                  </SelectItem>
+                  {isRegistryDataFetching ? (
+                    <SelectItem disabled={true} value="null">
+                      Fetching Registries...
+                    </SelectItem>
+                  ) : isRegistryDataSuccess && registryData?.data.length > 0 ? (
+                    registryData.data.map((item: EventRegistryResource) => (
+                      <SelectItem
+                        key={item.id}
+                        onClick={async () => {
+                          field.onChange(item.id);
+                        }}
+                        value={item.id}
+                      >
+                        {item.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem disabled={true} value="No registries found">
+                      No registries found
+                    </SelectItem>
+                  )}
                 </SelectContent>
               </Select>
               <FormDescription>
@@ -223,7 +396,10 @@ const CreateEndpointForm = () => {
             <FormItem>
               <Typography variant={"formFieldTitle"}>Select Events</Typography>
               <MultiSelect
-                options={eventList}
+                disabled={!eventRegistryValue && !isEventsDataSuccess}
+                options={(eventsData || []).map((e) => {
+                  return { value: e, label: e };
+                })}
                 onValueChange={(val) => {
                   field.onChange(val);
                   setSelectedEvents(val);
@@ -241,6 +417,7 @@ const CreateEndpointForm = () => {
             </FormItem>
           )}
         />
+
         <Button className="self-end" type="submit">
           Create Endpoint
         </Button>

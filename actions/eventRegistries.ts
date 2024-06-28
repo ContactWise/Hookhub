@@ -15,6 +15,7 @@ const getEventRegistries = async (tenantId: string, workspaceId: string) => {
     );
     return data;
   } catch (error) {
+    console.log("error", error);
     throw new Error("Error: Failed to fetch event registries.");
   }
 };
@@ -96,11 +97,16 @@ const getEvents = async (
   eventRegistryId: string
 ): Promise<string[]> => {
   try {
+    console.log(
+      "url",
+      `/api/v1/${tenantId}/workspaces/${workspaceId}/eventregistries/${eventRegistryId}/events`
+    );
     const { data } = await axios.get(
       `/api/v1/${tenantId}/workspaces/${workspaceId}/eventregistries/${eventRegistryId}/events`
     );
     return data;
   } catch (error) {
+    console.log("error", error);
     throw new Error("Error: Failed to fetch events.");
   }
 };

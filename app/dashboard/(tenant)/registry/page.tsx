@@ -25,7 +25,7 @@ const RegistryPage = async () => {
   const session: Session = (await auth()) as Session;
   const queryClient = new QueryClient();
 
-  const res = await queryClient.fetchQuery({
+  await queryClient.prefetchQuery({
     queryKey: ["getRegistries"],
     queryFn: () =>
       getEventRegistries(session!.user!.tenant, session!.user!.workspace),

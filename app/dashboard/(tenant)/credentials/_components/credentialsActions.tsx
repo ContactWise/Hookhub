@@ -25,6 +25,8 @@ import { Switch } from "@/components/ui/switch";
 import { setActiveStatus } from "@/actions/credentials";
 import Typography from "@/components/custom/typography";
 import EditServiceSheet from "@/app/dashboard/(application)/application/[applicationId]/_components/editServiceSheet";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 type Checked = DropdownMenuCheckboxItemProps["checked"];
 
@@ -36,10 +38,49 @@ const CredentialActions = ({
   const { tenant, workspace } = useEnvironmentContext();
 
   const [isActive, setIsActive] = React.useState(credential.isActive);
+  const { mutateAsync: updateStatusAsync } = useMutation({
+    mutationFn: async ({
+      credentialId,
+      newStatus,
+      tenantId,
+      workspaceId,
+    }: {
+      credentialId: string;
+      newStatus: boolean;
+      tenantId: string;
+      workspaceId: string;
+    }) => {
+      return setActiveStatus(tenantId, workspaceId, credentialId, newStatus);
+    },
+    onSuccess: () => {
+      console.log("Status updated successfully");
+    },
+    onError: (error: any) => {
+      console.error("Failed to update status", error);
+    },
+  });
 
+  // const handleSwitchChange = async (newStatus: boolean) => {
+  //   setIsActive(newStatus);
+  //   await setActiveStatus(tenant!.id, workspace!.id, credential.id, newStatus);
+  // };
   const handleSwitchChange = async (newStatus: boolean) => {
     setIsActive(newStatus);
-    await setActiveStatus(tenant!.id, workspace!.id, credential.id, newStatus);
+    return toast.promise(
+      updateStatusAsync({
+        credentialId: credential.id,
+        newStatus: newStatus,
+        tenantId: tenant!.id,
+        workspaceId: workspace!.id,
+      }),
+      {
+        loading: "Updating status...",
+        success(data) {
+          return "Status updated successfully";
+        },
+        error: "Failed to update status",
+      }
+    );
   };
 
   return (

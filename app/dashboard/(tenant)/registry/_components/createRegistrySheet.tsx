@@ -46,7 +46,11 @@ import {
 import Typography from "@/components/custom/typography";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { useMutation } from "@tanstack/react-query";
+import {
+  QueryClient,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { createCredential } from "@/actions/credentials";
 import { createEventRegistry } from "@/actions/eventRegistries";
 import { useEnvironmentContext } from "@/context/envContext";
@@ -67,7 +71,7 @@ const CreateRegistrySheet: FC<CreateRegistrySheetProps> = ({ children }) => {
     resolver: zodResolver(eventRegistryFormSchema),
     mode: "onBlur",
   });
-
+  const queryClient = useQueryClient();
   const { mutateAsync } = useMutation({
     mutationFn: ({
       tenantId,
@@ -78,6 +82,9 @@ const CreateRegistrySheet: FC<CreateRegistrySheetProps> = ({ children }) => {
       workspaceId: string;
       formData: z.infer<typeof eventRegistryFormSchema>;
     }) => createEventRegistry(tenantId, workspaceId, formData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["getRegistries"] });
+    },
   });
 
   const onSubmit = (data: EventRegistryFormValues) => {

@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Bell,
   CircleUser,
@@ -49,7 +47,7 @@ const links = [
     icon: <Home className="h-5 w-5" />,
   },
   {
-    href: "/dashboard/application/123/endpoints",
+    href: "/endpoints",
     label: "Endpoints",
     icon: <Link className="h-5 w-5" />,
   },
@@ -67,9 +65,12 @@ const links = [
 
 export default function DashboardLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: any;
 }) {
+  console.log("params in layout ", params);
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <NavigationSidebar links={links} />

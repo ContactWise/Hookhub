@@ -64,11 +64,32 @@ interface ApiResponse<T> {
   data: T;
 }
 
+interface EndpointResource {
+  name: string;
+  description: string;
+  isActive: boolean;
+  url: string;
+  method: number;
+  secret: string;
+  eventRegistryId: string;
+  events: string[];
+  source: string;
+  subject: string;
+  headers: {
+    [key: string]: string;
+  };
+  id: string;
+  createdAt: string;
+  createdBy: string;
+  lastModifiedAt: string;
+}
+
 export {
   Tenant,
   Workspace,
   Service,
   CredentialResource,
+  EndpointResource,
   ApiResponse,
   EventRegistryResource,
 };
