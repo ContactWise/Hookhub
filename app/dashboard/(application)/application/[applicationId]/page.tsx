@@ -156,36 +156,29 @@ const ApplicationPage = async ({ params }: any) => {
   );
   return (
     <Suspense fallback={<Loading />}>
-      <ErrorBoundary fallback={<Error />}>
-        <div className="flex gap-4 md:gap-4 flex-col  justify-between items-start ">
-          <div className="flex flex-col w-full md:w-3/4">
-            <Typography variant={"pageTitle"}>{res.name}</Typography>
-            <Typography
-              variant={"pageDescription"}
-              className="line-clamp-2 mt-1"
-            >
-              {res.description}{" "}
-            </Typography>
-          </div>
-
-          <div className="flex flex-col gap-2 md:flex-row justify-between w-full">
-            <Typography variant={"subTItle"}>
-              Application Url:{" "}
-              <span className="font-normal">https://dummyurl.com</span>
-            </Typography>
-
-            {/* <Badge className="self-start smd:self-auto">Active</Badge> */}
-            <ServiceActions service={res} />
-          </div>
+      {/* <ErrorBoundary fallback={<Error />}> */}
+      <div className="flex gap-4 md:gap-4 flex-col  justify-between items-start ">
+        <div className="flex flex-col w-full md:w-3/4">
+          <Typography variant={"pageTitle"}>{res.name}</Typography>
+          <Typography variant={"pageDescription"} className="line-clamp-2 mt-1">
+            {res.description}{" "}
+          </Typography>
         </div>
-        <ScrollArea className="flex flex-1 p-2 justify-center rounded-lg border border-dashed shadow-sm ">
-          <PaginatedTable
-            columns={COLUMNS}
-            data={data}
-            tableHead={tableHeader}
-          />
-        </ScrollArea>
-      </ErrorBoundary>
+
+        <div className="flex flex-col gap-2 md:flex-row justify-between w-full">
+          <Typography variant={"subTItle"}>
+            Application Url:{" "}
+            <span className="font-normal">https://dummyurl.com</span>
+          </Typography>
+
+          {/* <Badge className="self-start smd:self-auto">Active</Badge> */}
+          <ServiceActions service={res} />
+        </div>
+      </div>
+      <ScrollArea className="flex flex-1 p-2 justify-center rounded-lg border border-dashed shadow-sm ">
+        <PaginatedTable columns={COLUMNS} data={data} tableHead={tableHeader} />
+      </ScrollArea>
+      {/* </ErrorBoundary> */}
     </Suspense>
   );
 };
