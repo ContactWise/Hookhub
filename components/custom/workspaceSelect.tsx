@@ -18,6 +18,7 @@ import { LoaderCircle, PlusCircle } from "lucide-react";
 import CreateWorkspaceDialog from "../createWorkspaceDialog";
 import { auth, handlers } from "@/auth";
 import { useSession } from "next-auth/react";
+import { set } from "date-fns";
 
 const WorkspaceSelect = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
@@ -38,14 +39,16 @@ const WorkspaceSelect = React.forwardRef<
   });
 
   useEffect(() => {
-    refetch();
+    refetch().then(() => {
+      console.log("workspaceData refetch", workspacesData);
+      if (workspacesData && workspacesData.data.length > 0) {
+        setWorkspace(workspacesData.data[0]);
+      }
+    });
   }, [tenant]);
 
   const { data: session, status, update } = useSession();
 
-  useEffect(() => {
-    console.log("session from client", session);
-  }, [status, session]);
   return (
     <Select disabled={isWorkspacesLoading}>
       <SelectTrigger className={cn(className)} {...props}>

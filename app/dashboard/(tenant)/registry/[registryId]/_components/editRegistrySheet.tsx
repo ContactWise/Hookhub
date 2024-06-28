@@ -48,48 +48,71 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { createService, getServiceById } from "@/actions/services";
 import { useEnvironmentContext } from "@/context/envContext";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Pen } from "lucide-react";
+import {
+  getEventRegistryById,
+  updateEventRegistry,
+} from "@/actions/eventRegistries";
 
-type EditServiceFormValues = z.infer<typeof editServiceFormSchema>;
-const editServiceFormSchema = z.object({
+type EditRegistryFormValues = z.infer<typeof editRegistryFormSchema>;
+const editRegistryFormSchema = z.object({
   name: z.string().min(3),
   description: z.string().min(10),
 });
 
-interface EditServiceSheetProps {
-  serviceId: string;
-  //   children: React.ReactNode;
+interface EditRegistrySheetProps {
+  registryId: string;
 }
 
-const EditServiceSheet: FC<EditServiceSheetProps> = ({
+const EditRegistrySheet: FC<EditRegistrySheetProps> = ({
   //   children,
-  serviceId,
+  registryId,
 }) => {
   const { tenant, workspace } = useEnvironmentContext();
 
   const { data, isFetched, error, isLoading } = useQuery({
-    queryKey: ["getTenant", serviceId],
-    queryFn: () => getServiceById(tenant!.id, workspace!.id, serviceId),
+    queryKey: ["getRegistry", registryId],
+    queryFn: () => getEventRegistryById(tenant!.id, workspace!.id, registryId),
   });
 
-  const form = useForm<EditServiceFormValues>({
-    resolver: zodResolver(editServiceFormSchema),
+  const form = useForm<EditRegistryFormValues>({
+    resolver: zodResolver(editRegistryFormSchema),
     mode: "onSubmit",
   });
 
   useEffect(() => {
     if (isFetched && data) {
-      form.reset(data.data);
+      form.reset(data);
     }
   }, [isFetched, data, form.reset]);
 
-  const onSubmit = async (data: EditServiceFormValues) => {
-    const res = await createService(tenant!.id, workspace!.id, data);
-    return toast(
-      <div>
-        <pre>{JSON.stringify(data, null, 2)}</pre>
-      </div>
+  const { mutateAsync } = useMutation({
+    mutationFn: ({
+      tenantId,
+      workspaceId,
+      eventRegistryId,
+      formData,
+    }: {
+      tenantId: string;
+      workspaceId: string;
+      eventRegistryId: string;
+      formData: z.infer<typeof editRegistryFormSchema>;
+    }) => updateEventRegistry(tenantId, workspaceId, eventRegistryId, formData),
+  });
+  const onSubmit = async (data: EditRegistryFormValues) => {
+    return toast.promise(
+      mutateAsync({
+        tenantId: tenant!.id,
+        workspaceId: workspace!.id,
+        eventRegistryId: registryId,
+        formData: data,
+      }),
+      {
+        loading: "Updating registry...",
+        success: "Registry updated successfully",
+        error: "An error occurred while updating registry",
+      }
     );
   };
 
@@ -97,13 +120,12 @@ const EditServiceSheet: FC<EditServiceSheetProps> = ({
     <Sheet>
       <SheetTrigger asChild>
         <div className="flex gap-2  items-center">
-          <Pen size={14} />
-          <span>Edit Service</span>
+          <span>Edit Registry</span>
         </div>
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-[550px]">
         <SheetHeader>
-          <Typography variant="formHeading">Create New Application</Typography>
+          <Typography variant="formHeading">Edit Registry</Typography>
         </SheetHeader>
         <Form {...form}>
           <form
@@ -119,11 +141,11 @@ const EditServiceSheet: FC<EditServiceSheetProps> = ({
                   <FormLabel>
                     {" "}
                     <Typography variant={"formFieldTitle"}>
-                      Application Name
+                      Registry Name
                     </Typography>
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="Application name..." {...field} />
+                    <Input placeholder="Registry name..." {...field} />
                   </FormControl>
                   <FormDescription>
                     lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -141,12 +163,12 @@ const EditServiceSheet: FC<EditServiceSheetProps> = ({
                   <FormLabel>
                     {" "}
                     <Typography variant={"formFieldTitle"}>
-                      Application Description
+                      Registry Description
                     </Typography>
                   </FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Application Description..."
+                      placeholder="Registry Description..."
                       className="resize-none"
                       {...field}
                     />
@@ -160,7 +182,7 @@ const EditServiceSheet: FC<EditServiceSheetProps> = ({
             />
 
             <Button disabled={!!error || isLoading} type="submit">
-              Create Service
+              Update Registry
             </Button>
           </form>
         </Form>
@@ -169,4 +191,4 @@ const EditServiceSheet: FC<EditServiceSheetProps> = ({
   );
 };
 
-export default EditServiceSheet;
+export default EditRegistrySheet;

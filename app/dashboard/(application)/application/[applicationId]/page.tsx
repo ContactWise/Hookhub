@@ -139,15 +139,15 @@ const ApplicationPage = async ({ params }: any) => {
   console.log("session on page", session);
   const queryClient = new QueryClient();
 
-  // const res = await queryClient.fetchQuery({
-  //   queryKey: ["getService"],
-  //   queryFn: () =>
-  //     getServiceById(
-  //       session!.user!.tenant,
-  //       session!.user!.workspace,
-  //       applicationId
-  //     ),
-  // });
+  const res = await queryClient.fetchQuery({
+    queryKey: ["getService", applicationId],
+    queryFn: () =>
+      getServiceById(
+        session!.user!.tenant,
+        session!.user!.workspace,
+        applicationId
+      ),
+  });
 
   const tableHeader = (
     <div className="flex justify-start">
@@ -159,15 +159,12 @@ const ApplicationPage = async ({ params }: any) => {
       <ErrorBoundary fallback={<Error />}>
         <div className="flex gap-4 md:gap-4 flex-col  justify-between items-start ">
           <div className="flex flex-col w-full md:w-3/4">
-            <Typography variant={"pageTitle"}>Application Name</Typography>
+            <Typography variant={"pageTitle"}>{res.name}</Typography>
             <Typography
               variant={"pageDescription"}
               className="line-clamp-2 mt-1"
             >
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-              tincidunt, nunc nec lacinia aliquam, est libero ultricies purus,
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-              tincidunt, nunc nec lacinia aliquam, est libero ultricies purus,
+              {res.description}{" "}
             </Typography>
           </div>
 
@@ -178,7 +175,7 @@ const ApplicationPage = async ({ params }: any) => {
             </Typography>
 
             {/* <Badge className="self-start smd:self-auto">Active</Badge> */}
-            <ServiceActions service={demoService} />
+            <ServiceActions service={res} />
           </div>
         </div>
         <ScrollArea className="flex flex-1 p-2 justify-center rounded-lg border border-dashed shadow-sm ">

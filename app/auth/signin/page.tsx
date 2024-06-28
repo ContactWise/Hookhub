@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signInSchema } from "@/schemas/auth";
 import SignInForm from "./_components/signInForm";
+import { getTenants } from "@/actions/tenants";
 
-const SignInPage = () => {
+const SignInPage = async () => {
   return (
     <>
       <div className="w-full lg:grid lg:min-h-[600px] h-full lg:grid-cols-2 xl:min-h-[800px]">

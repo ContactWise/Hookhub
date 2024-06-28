@@ -1,5 +1,7 @@
 "use client";
 
+import { getTenantById } from "@/actions/tenants";
+import { getWorkspaceById } from "@/actions/workspaces";
 import { getTenants, getWorkspaces } from "@/queries/getUserDetails";
 import { Tenant, Workspace } from "@/types";
 import { useQuery } from "@tanstack/react-query";
@@ -41,31 +43,68 @@ export const EnvironmentProvider = ({ children }: { children: ReactNode }) => {
     setWorkspaceState(value);
     if (session) {
       console.log("session", session);
-      await update({ ...session, workspace: value });
+      await update({ ...session!.user, workspace: value.id });
     }
   };
 
-  useEffect(() => {
-    const fetchTenants = async () => {
-      const tenants = await getTenants();
-      if (tenants.data.length > 0) {
-        setTenant(tenants.data[0]);
-      }
-    };
-    fetchTenants();
-  }, []);
+  const {
+    data: workspacesData,
+    isFetched: isWorkspacesFetched,
+    error: workspacesDataError,
+    isLoading: isWorkspacesLoading,
+    isSuccess: workspacesQuerySuccess,
+  } = useQuery({
+    queryKey: ["getWorkspaceById"],
+    queryFn: () =>
+      getWorkspaceById(session!.user!.tenant, session!.user?.workspace!),
+    enabled: !!tenant,
+  });
+
+  const {
+    data: tenantData,
+    isFetched: isTenantFetched,
+    error: tenantDataError,
+    isLoading: isTenantLoading,
+    isSuccess: tenantQuerySuccess,
+  } = useQuery({
+    queryKey: ["getTenantById"],
+    queryFn: () => getTenantById(session!.user!.tenant),
+  });
 
   useEffect(() => {
-    const fetchWorkspaces = async () => {
-      if (tenant) {
-        const workspaces = await getWorkspaces(tenant.id);
-        if (workspaces.data.length > 0) {
-          setWorkspace(workspaces.data[0]);
-        }
-      }
-    };
-    fetchWorkspaces();
-  }, [tenant]);
+    if (tenantQuerySuccess) {
+      console.log("setting tenant", tenantData);
+      setTenant(tenantData);
+    }
+  }, [tenantQuerySuccess]);
+  useEffect(() => {
+    if (workspacesQuerySuccess) {
+      console.log("setting workspace", workspacesData);
+      setWorkspace(workspacesData);
+    }
+  }, [workspacesQuerySuccess]);
+
+  // useEffect(() => {
+  //   const fetchTenants = async () => {
+  //     const tenants = await getTenants();
+  //     if (tenants.data.length > 0) {
+  //       setTenant(tenants.data[0]);
+  //     }
+  //   };
+  //   fetchTenants();
+  // }, []);
+
+  // useEffect(() => {
+  //   const fetchWorkspaces = async () => {
+  //     if (tenant) {
+  //       const workspaces = await getWorkspaces(tenant.id);
+  //       if (workspaces.data.length > 0) {
+  //         setWorkspace(workspaces.data[0]);
+  //       }
+  //     }
+  //   };
+  //   fetchWorkspaces();
+  // }, [tenant]);
 
   return (
     <EnvironmentContext.Provider

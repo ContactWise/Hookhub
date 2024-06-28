@@ -1,7 +1,7 @@
-"use client";
+"use server";
 
 import { tenantRequestSchema } from "@/schemas/tenant";
-import axios from "axios";
+import axios from "@/queries/axiosInstance";
 import { z } from "zod";
 
 const getTenants = async () => {
@@ -9,6 +9,7 @@ const getTenants = async () => {
     const { data } = await axios.get("/api/v1/tenants/list");
     return data;
   } catch (error) {
+    console.log({ error });
     throw new Error("Error: Failed to fetch tenants.");
   }
 };

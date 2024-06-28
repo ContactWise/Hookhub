@@ -32,7 +32,11 @@ const DynamicBreadcrumbsList: FC<DynamicBreadcrumbsProps> = ({
     : path
         .split("/")
         .filter((item) => item)
-        .map((item) => ({ href: `/${item}`, label: item }));
+        .reduce((acc, item, index, array) => {
+          const href = `${acc.length > 0 ? acc[acc.length - 1].href : ""}/${item}`;
+          acc.push({ href, label: item });
+          return acc;
+        }, [] as BreadcrumbItem[]);
 
   return (
     <>

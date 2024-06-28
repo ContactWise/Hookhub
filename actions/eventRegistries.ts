@@ -5,6 +5,7 @@ import {
   createEventRequestSchema,
   eventRegistryRequestSchema,
 } from "@/schemas/eventRegistry";
+import { ApiResponse, EventRegistryResource } from "@/types";
 import { z } from "zod";
 
 const getEventRegistries = async (tenantId: string, workspaceId: string) => {
@@ -42,7 +43,7 @@ const getEventRegistryById = async (
   tenantId: string,
   workspaceId: string,
   eventRegistryId: string
-) => {
+): Promise<EventRegistryResource> => {
   try {
     const { data } = await axios.get(
       `/api/v1/${tenantId}/workspaces/${workspaceId}/eventregistries/${eventRegistryId}`
@@ -89,11 +90,11 @@ const deleteEventRegistry = async (
   }
 };
 
-const listEvents = async (
+const getEvents = async (
   tenantId: string,
   workspaceId: string,
   eventRegistryId: string
-) => {
+): Promise<string[]> => {
   try {
     const { data } = await axios.get(
       `/api/v1/${tenantId}/workspaces/${workspaceId}/eventregistries/${eventRegistryId}/events`
@@ -112,14 +113,21 @@ const createEvent = async (
 ) => {
   const { name } = createEventRequestSchema.parse(formData);
   try {
+    console.log(
+      "url",
+      `/api/v1/${tenantId}/workspaces/${workspaceId}/eventregistries/${eventRegistryId}/events`
+    );
     const res = await axios.put(
       `/api/v1/${tenantId}/workspaces/${workspaceId}/eventregistries/${eventRegistryId}/events`,
       {
         name,
       }
     );
-    return res.data;
+    if (res.data.result === false) {
+      throw new Error("Error: Server indicated failure in creating event.");
+    }
   } catch (error) {
+    console.log({ error });
     throw new Error("Error: Failed to create event.");
   }
 };
@@ -128,16 +136,36 @@ const deleteEvent = async (
   tenantId: string,
   workspaceId: string,
   eventRegistryId: string,
-  eventId: string
+  eventName: string
 ) => {
   try {
-    const res = await axios.put(
-      `/api/v1/${tenantId}/workspaces/${workspaceId}/eventregistries/${eventRegistryId}/events/${eventId}`
+    console.log(
+      "url",
+      `/api/v1/${tenantId}/workspaces/${workspaceId}/eventregistries/${eventRegistryId}/events`
     );
+    console.log({ eventName });
+    const res = await axios.put(
+      `/api/v1/${tenantId}/workspaces/${workspaceId}/eventregistries/${eventRegistryId}/events`,
+      { name: eventName }
+    );
+    if (res.data.result === false) {
+      throw new Error("Error: Server indicated failure in deleting event.");
+    }
+
     return res.data;
   } catch (error) {
+    console.log({ error });
     throw new Error("Error: Failed to delete event.");
   }
 };
 
-export { getEventRegistries };
+export {
+  getEventRegistries,
+  createEventRegistry,
+  getEventRegistryById,
+  updateEventRegistry,
+  deleteEventRegistry,
+  getEvents,
+  createEvent,
+  deleteEvent,
+};

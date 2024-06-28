@@ -8,33 +8,31 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { EventRegistryResource } from "@/types";
 import { ChevronRight } from "lucide-react";
+import Link from "next/link";
 import { FC } from "react";
 
-interface RegistryCardDetails {
-  evenCount: number;
-  registryName: string;
-  description: string;
-}
-
 interface RegistryCardProps {
-  registryCard: RegistryCardDetails;
+  registry: EventRegistryResource;
 }
 
-const RegistryCard: FC<RegistryCardProps> = ({ registryCard }) => {
+const RegistryCard: FC<RegistryCardProps> = ({ registry }) => {
   return (
     <Card>
       <CardHeader>
-        <Typography variant={"cardTitle"}>
-          {registryCard.registryName}
-        </Typography>
+        <Link href={`/dashboard/registry/${registry.id}`}>
+          <Typography className="text-primary underline" variant={"cardTitle"}>
+            {registry.name}
+          </Typography>
+        </Link>
         <Typography variant="cardDescription" className="line-clamp-2">
-          {registryCard.description}
+          {registry.description}
         </Typography>
       </CardHeader>
       <CardContent>
         <Badge className=" p-1 sm:p-2" variant="secondary">
-          Event Count: {registryCard.evenCount}
+          Event Count: {registry.eventTypes.length}
         </Badge>
       </CardContent>
     </Card>

@@ -34,7 +34,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MultiSelect } from "@/components/multiselect";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -46,63 +46,102 @@ import {
 import Typography from "@/components/custom/typography";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { useMutation } from "@tanstack/react-query";
-import { createCredential } from "@/actions/credentials";
-import { createEventRegistry } from "@/actions/eventRegistries";
+import {
+  createService,
+  getServiceById,
+  updateService,
+} from "@/actions/services";
 import { useEnvironmentContext } from "@/context/envContext";
+import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { Pen } from "lucide-react";
 
-interface CreateRegistrySheetProps {
-  children: React.ReactNode;
-}
-
-const eventRegistryFormSchema = z.object({
+type EditServiceFormValues = z.infer<typeof editServiceFormSchema>;
+const editServiceFormSchema = z.object({
   name: z.string().min(3),
   description: z.string().min(10),
 });
-type EventRegistryFormValues = z.infer<typeof eventRegistryFormSchema>;
 
-const CreateRegistrySheet: FC<CreateRegistrySheetProps> = ({ children }) => {
-  const { workspace, tenant } = useEnvironmentContext();
-  const form = useForm<EventRegistryFormValues>({
-    resolver: zodResolver(eventRegistryFormSchema),
-    mode: "onBlur",
+interface EditServiceSheetProps {
+  serviceId: string;
+  //   children: React.ReactNode;
+}
+
+const EditServiceSheet: FC<EditServiceSheetProps> = ({
+  //   children,
+  serviceId,
+}) => {
+  const { tenant, workspace } = useEnvironmentContext();
+  const queryClient = new QueryClient();
+  const { data, isFetched, error, isLoading } = useQuery({
+    queryKey: ["getTenant", serviceId],
+    queryFn: () => getServiceById(tenant!.id, workspace!.id, serviceId),
   });
+
+  const form = useForm<EditServiceFormValues>({
+    resolver: zodResolver(editServiceFormSchema),
+    mode: "onSubmit",
+    defaultValues: {
+      name: data?.name,
+      description: data?.description,
+    },
+  });
+
+  useEffect(() => {
+    if (isFetched && data) {
+      form.reset(data);
+    }
+  }, [isFetched, data, form.reset]);
+
+  // useEffect(() => {
+  //   if (isFetched && data) {
+  //     form.reset(data);
+  //   }
+  // }, [isFetched, data, form.reset]);
 
   const { mutateAsync } = useMutation({
     mutationFn: ({
       tenantId,
       workspaceId,
+      serviceId,
       formData,
     }: {
       tenantId: string;
       workspaceId: string;
-      formData: z.infer<typeof eventRegistryFormSchema>;
-    }) => createEventRegistry(tenantId, workspaceId, formData),
+      serviceId: string;
+      formData: z.infer<typeof editServiceFormSchema>;
+    }) => updateService(tenantId, workspaceId, serviceId, formData),
+    onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ["getService"] });
+    },
   });
 
-  const onSubmit = (data: EventRegistryFormValues) => {
+  const onSubmit = async (data: EditServiceFormValues) => {
     return toast.promise(
       mutateAsync({
         tenantId: tenant!.id,
         workspaceId: workspace!.id,
+        serviceId: serviceId,
         formData: data,
       }),
       {
-        loading: "Creating Event Registry...",
-        success: "Event Registry created successfully",
-        error: "Failed to create Event Registry",
+        loading: "Updating service...",
+        success: "Service updated successfully",
+        error: "An error occurred while updating service",
       }
     );
   };
 
   return (
     <Sheet>
-      <SheetTrigger asChild>{children}</SheetTrigger>
+      <SheetTrigger asChild disabled={!isFetched}>
+        <div className="flex gap-2  items-center">
+          <Pen size={14} />
+          <span>Edit Service</span>
+        </div>
+      </SheetTrigger>
       <SheetContent className="w-full sm:max-w-[550px]">
         <SheetHeader>
-          <Typography variant="formHeading">
-            Create New Event Registry
-          </Typography>
+          <Typography variant="formHeading">Create New Application</Typography>
         </SheetHeader>
         <Form {...form}>
           <form
@@ -110,16 +149,19 @@ const CreateRegistrySheet: FC<CreateRegistrySheetProps> = ({ children }) => {
             className="space-y-8 flex-col mt-2"
           >
             <FormField
+              disabled={!!error || isLoading}
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
                     {" "}
-                    <Typography variant={"formFieldTitle"}>Name</Typography>
+                    <Typography variant={"formFieldTitle"}>
+                      Application Name
+                    </Typography>
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="Registry name..." {...field} />
+                    <Input placeholder="Application name..." {...field} />
                   </FormControl>
                   <FormDescription>
                     lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -129,6 +171,7 @@ const CreateRegistrySheet: FC<CreateRegistrySheetProps> = ({ children }) => {
               )}
             />
             <FormField
+              disabled={!!error || isLoading}
               control={form.control}
               name="description"
               render={({ field }) => (
@@ -136,13 +179,12 @@ const CreateRegistrySheet: FC<CreateRegistrySheetProps> = ({ children }) => {
                   <FormLabel>
                     {" "}
                     <Typography variant={"formFieldTitle"}>
-                      Description
+                      Application Description
                     </Typography>
                   </FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Registry Description..."
-                      className="resize-none"
+                      placeholder="Application Description..."
                       {...field}
                     />
                   </FormControl>
@@ -154,7 +196,9 @@ const CreateRegistrySheet: FC<CreateRegistrySheetProps> = ({ children }) => {
               )}
             />
 
-            <Button type="submit">Create Registry</Button>
+            <Button disabled={!!error || isLoading} type="submit">
+              Update Service
+            </Button>
           </form>
         </Form>
       </SheetContent>
@@ -162,4 +206,4 @@ const CreateRegistrySheet: FC<CreateRegistrySheetProps> = ({ children }) => {
   );
 };
 
-export default CreateRegistrySheet;
+export default EditServiceSheet;

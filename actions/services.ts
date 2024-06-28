@@ -25,7 +25,7 @@ const getServiceById = async (
   tenantId: string,
   workspaceId: string,
   serviceId: string
-): Promise<ApiResponse<Service>> => {
+): Promise<Service> => {
   try {
     console.log({ tenantId, workspaceId, serviceId });
     const { data } = await axios.get(

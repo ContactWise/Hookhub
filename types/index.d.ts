@@ -41,6 +41,20 @@ interface CredentialResource {
   lastModifiedAt: string;
 }
 
+interface EventRegistryResource {
+  id: string;
+  name: string;
+  description: string;
+  eventTypes: string[];
+  createdAt: string;
+  createdBy: string;
+  lastModifiedAt: string;
+}
+
+interface EventResource {
+  name: string;
+}
+
 interface ApiResponse<T> {
   pagination: {
     currentPage: number;
@@ -50,4 +64,11 @@ interface ApiResponse<T> {
   data: T;
 }
 
-export { Tenant, Workspace, Service, CredentialResource, ApiResponse };
+export {
+  Tenant,
+  Workspace,
+  Service,
+  CredentialResource,
+  ApiResponse,
+  EventRegistryResource,
+};

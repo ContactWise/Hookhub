@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { deleteService } from "@/actions/services";
 import { z } from "zod";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface deleteServiceInput {
   tenantId: string;
@@ -34,6 +35,7 @@ const DeleteServiceDialog = ({
   workspace: Workspace;
 }) => {
   const queryClient = useQueryClient();
+  const router = useRouter();
   //   const { mutateAsync } = useMutation(deleteService, {
   //     onSuccess: () => {
   //       // refetch the articles list
@@ -44,25 +46,33 @@ const DeleteServiceDialog = ({
     mutationFn: (values: deleteServiceInput) =>
       deleteService(values.tenantId, values.workspaceId, values.serviceId),
     onSuccess: () => {
-      // queryClient.invalidateQueries(["getService"]);
-      toast.success("Service deleted successfully");
+      router.push("/dashboard/applications");
     },
   });
 
   const handleDelete = () => {
-    mutateAsync({
-      tenantId: tenant.id,
-      workspaceId: workspace.id,
-      serviceId: service.id,
-    }); // Assuming `service.id` is the identifier for the service to be deleted
+    return toast.promise(
+      mutateAsync({
+        tenantId: tenant.id,
+        workspaceId: workspace.id,
+        serviceId: service.id,
+      }),
+      {
+        loading: "Deleting Service...",
+        success: "Service deleted successfully",
+        error: "Failed to delete Service",
+      }
+    ); // Assuming `service.id` is the identifier for the service to be deleted
   };
 
   return (
-    <CustomDialog trigger={<span>Delete Tenant</span>}>
+    <CustomDialog trigger={<span>Delete Service</span>}>
       <Typography variant="cardTitle">Delete Service</Typography>
       <div className="flex flex-col gap-3 p-1 pt-0">
         <Typography variant="cardDescription">
-          Are you sure you want to delete {service.name} service?
+          {`Are you sure you want to delete `}
+          <strong>{service.name}</strong>
+          {` service?`}
         </Typography>
         <Button variant={"destructive"} onClick={handleDelete}>
           Delete Service

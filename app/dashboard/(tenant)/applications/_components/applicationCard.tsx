@@ -8,9 +8,11 @@ import { Switch } from "@/components/ui/switch";
 import { useEnvironmentContext } from "@/context/envContext";
 import { cn } from "@/lib/utils";
 import { Service } from "@/types";
+import { QueryClient, useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { FC, useState } from "react";
+import { toast } from "sonner";
 
 export interface Application {
   isActive: boolean;
@@ -30,10 +32,47 @@ const ApplicationCard: FC<ApplicationCardProps> = React.forwardRef<
   const { tenant, workspace } = useEnvironmentContext();
 
   const router = useRouter();
+  const queryClient = new QueryClient();
+  const { mutateAsync: updateStatusAsync } = useMutation({
+    mutationFn: async ({
+      applicationId,
+      newStatus,
+      tenantId,
+      workspaceId,
+    }: {
+      applicationId: string;
+      newStatus: boolean;
+      tenantId: string;
+      workspaceId: string;
+    }) => {
+      return setActiveStatus(applicationId, newStatus, tenantId, workspaceId);
+    },
+    onSuccess: () => {
+      console.log("Status updated successfully");
+      queryClient.invalidateQueries();
+    },
+    onError: (error: any) => {
+      console.error("Failed to update status", error);
+    },
+  });
 
   const handleSwitchChange = async (newStatus: boolean) => {
     setIsActive(newStatus);
-    await setActiveStatus(application.id, newStatus, tenant!.id, workspace!.id);
+    return toast.promise(
+      updateStatusAsync({
+        applicationId: application.id,
+        newStatus: newStatus,
+        tenantId: tenant!.id,
+        workspaceId: workspace!.id,
+      }),
+      {
+        loading: "Updating status...",
+        success(data) {
+          return "Status updated successfully";
+        },
+        error: "Failed to update status",
+      }
+    );
   };
 
   return (

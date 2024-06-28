@@ -40,25 +40,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const { email, password } = await signInSchema.parseAsync(credentials);
         console.log("attempting to sign in with", email, password);
 
-        // Assuming the creds.json structure is an array of user objects { email, password }
         const user = data.users.find((u: dBUser) => u.email === email);
 
         if (!user) {
-          // User not found by email
           throw new Error("User not found.");
         }
-
-        // Assuming a simple comparison for demonstration; in a real application, use secure password hashing
         if (user.password !== password) {
-          // Password does not match
           throw new Error("Invalid password.");
         }
 
         console.log("user authentication successful", user);
         console.log("user found", user);
         if (!user) {
-          // No user found, so this is their first attempt to login
-          // meaning this is also the place you could do registration
           throw new Error("User not found.");
         }
         return user;
@@ -67,41 +60,31 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     jwt: async ({ token, user, trigger, session }) => {
-      // If the trigger is "update", update the token and return immediately
       if (trigger === "update" && session) {
-        // Update the token as needed based on the session or other logic
-        console.log;
-        token = { ...token, user: session /* other fields as needed */ };
+        console.log("updating token", { token, session });
+        token = { ...token, user: session };
         console.log("token updated", token);
         return token;
       }
 
-      // Proceed with fetching tenants and workspaces only if the trigger is not "update"
       if (user) {
         console.log("user", user);
         token.role = user.role;
         const tenants = await getTenants();
         if (tenants.data.length > 0) {
           const firstTenantId = tenants.data[0].id;
-          token.tenant = firstTenantId; // Set the first tenant's ID
-
-          // Fetch workspaces using the first tenant's ID
+          token.tenant = firstTenantId;
           const workspaces = await getWorkspaces(firstTenantId);
-          console.log("tenants fetched", tenants);
-          console.log("workspaces fetched", workspaces);
           token.workspace =
-            workspaces.data.length > 0 ? workspaces.data[0].id : ""; // Assuming each workspace has an id
+            workspaces.data.length > 0 ? workspaces.data[0].id : "";
         } else {
           token.tenant = "";
           token.workspace = "";
         }
       }
-      console.log("initial token", token);
-      // Return the token with any updates made during this function call
       return token;
     },
     session({ session, token }) {
-      console.log("token from session", token);
       session.user.role = token.role;
       session.user.tenant = token.tenant;
       session.user.workspace = token.workspace;

@@ -7,72 +7,79 @@ import { useEnvironmentContext } from "@/context/envContext";
 import { getTenants } from "@/queries/getUserDetails";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Typography from "@/components/custom/typography";
-import { CredentialResource, Service, Tenant, Workspace } from "@/types";
+import {
+  CredentialResource,
+  EventRegistryResource,
+  Service,
+  Tenant,
+  Workspace,
+} from "@/types";
 import { useState } from "react";
 import {
   DropdownMenuItem,
   DropdownMenuLabel,
 } from "@radix-ui/react-dropdown-menu";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { deleteService } from "@/actions/services";
 import { z } from "zod";
 import { toast } from "sonner";
 import { deleteCredential } from "@/actions/credentials";
+import { deleteEvent, deleteEventRegistry } from "@/actions/eventRegistries";
 
 interface deleteCredentialInput {
   tenantId: string;
   workspaceId: string;
-  credentialId: string;
+  eventRegistryId: string;
 }
-const DeleteCredentialDailog = ({
-  credential,
-  tenant,
-  workspace,
+const DeleteRegistryDialog = ({
+  eventRegistry,
+  workspaceId,
+  tenantId,
 }: {
-  credential: CredentialResource;
-  tenant: Tenant;
-  workspace: Workspace;
+  eventRegistry: EventRegistryResource;
+  workspaceId: string;
+  tenantId: string;
 }) => {
   const { mutateAsync } = useMutation({
     mutationFn: (values: deleteCredentialInput) =>
-      deleteCredential(
+      deleteEventRegistry(
         values.tenantId,
         values.workspaceId,
-        values.credentialId
+        values.eventRegistryId
       ),
   });
 
   const handleDelete = () => {
     return toast.promise(
       mutateAsync({
-        tenantId: tenant.id,
-        workspaceId: workspace.id,
-        credentialId: credential.id,
+        tenantId: tenantId,
+        workspaceId: workspaceId,
+        eventRegistryId: eventRegistry.id,
       }),
       {
-        loading: "Deleting credentials...",
-        success: "Credentials deleted successfully",
-        error: "An error occurred while deleting credentials",
+        loading: "Deleting registry...",
+        success: "Registry deleted successfully",
+        error: "An error occurred while deleting registry",
       }
     );
   };
 
   return (
-    <CustomDialog trigger={<span>Delete Credentials</span>}>
-      <Typography variant="cardTitle">Delete Credentials</Typography>
+    <CustomDialog trigger={<span>Delete Registry</span>}>
+      <Typography variant="cardTitle">Delete Registry</Typography>
       <div className="flex flex-col gap-3 p-1 pt-0">
         <Typography variant="cardDescription">
           {`Are you sure you want to delete `}
-          <strong>{credential.name}</strong>
-          {` credentials?`}
+          <strong>{eventRegistry.name}</strong>
+          {` registry?`}
         </Typography>
         <Button variant={"destructive"} onClick={handleDelete}>
-          Delete Credentials
+          Delete Registry
         </Button>
       </div>
     </CustomDialog>
   );
 };
 
-export default DeleteCredentialDailog;
+export default DeleteRegistryDialog;
