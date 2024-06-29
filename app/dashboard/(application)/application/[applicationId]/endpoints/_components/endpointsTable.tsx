@@ -8,32 +8,39 @@ import { Button } from "@/components/ui/button";
 import { useEnvironmentContext } from "@/context/envContext";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-
-const COLUMNS = [
-  {
-    name: "id",
-    label: "ID",
-  },
-  {
-    name: "name",
-    label: "Name",
-  },
-  {
-    name: "url",
-    label: "Url",
-  },
-  {
-    name: "events",
-    label: "Events",
-  },
-  {
-    name: "actions",
-    label: "Actions",
-  },
-];
+import EndpointActions from "./endpointActions";
 
 const EndpointsTable = ({ serviceId }: { serviceId: string }) => {
   const { tenant, workspace } = useEnvironmentContext();
+
+  const COLUMNS = [
+    {
+      name: "id",
+      label: "ID",
+    },
+    {
+      name: "name",
+      label: "Name",
+    },
+    {
+      name: "url",
+      label: "Url",
+    },
+    {
+      name: "events",
+      label: "Events",
+      render: (item: any) => (
+        <span className="truncate max-w-xs">{`[${item.events.join(", ")}]`}</span>
+      ),
+    },
+    {
+      name: "actions",
+      label: "Actions",
+      render: (item: any) => {
+        return <EndpointActions endpoint={item} serviceId={serviceId} />;
+      },
+    },
+  ];
 
   const { isLoading, isError, error, data, isFetched, isPlaceholderData } =
     useQuery({
@@ -46,41 +53,24 @@ const EndpointsTable = ({ serviceId }: { serviceId: string }) => {
     console.log(data!.data);
   }
 
-  const TableHeader = (
-    <div className="flex justify-between items-center">
-      <Typography variant={"tableHeading"} className="text-lg">
-        Endpoints
-      </Typography>
-      {/* <AddEndpointSheet /> */}
-      <Link href={`/dashboard/application/${serviceId}/endpoints/create`}>
-        <Button>Create New Endpoint +</Button>
-      </Link>
-    </div>
-  );
-
   return (
-    <>
+    <div className="h-full">
       {isLoading || !isFetched ? (
         <div className="w-full flex-1 flex flex-col justify-center items-center">
           <LoadingDots />
           {/* <Typography variant={"pageDescription"}>Loading...</Typography> */}
         </div>
       ) : isFetched && data!.data.length > 0 ? (
-        <PaginatedTable
-          paginated
-          tableHead={TableHeader}
-          columns={COLUMNS}
-          data={data!.data}
-        />
+        <PaginatedTable columns={COLUMNS} data={data!.data} />
       ) : (
-        <div>
-          <Typography variant="subTItle">No services created</Typography>
+        <div className="flex flex-col justify-center items-center w-full flex-1 h-full border-dashed bordermu border-2 rounded-lg">
+          <Typography variant="subTItle">No endpoints created</Typography>
           <Typography variant="pageDescription">
-            Start by creating a new service
+            Start by creating a new endpoint
           </Typography>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

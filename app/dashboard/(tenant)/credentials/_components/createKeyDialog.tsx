@@ -61,6 +61,9 @@ const CreateKeyDialog: FC<CreateKeyDialogProps> = () => {
       workspaceId: string;
       formData: z.infer<typeof credentialsRequestSchema>;
     }) => createCredential(tenantId, workspaceId, formData),
+    onSettled: () => {
+      form.reset();
+    },
   });
 
   const onSubmit = (data: CreateCredentialsFormValues) => {

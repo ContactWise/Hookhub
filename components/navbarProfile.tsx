@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "./ui/button";
+import { signOut } from "next-auth/react";
 import { CircleUser } from "lucide-react";
 import SelectTenantDialog from "./custom/tenantSelectionDialog";
 
@@ -32,7 +33,13 @@ const NavbarProfile = () => {
           <SelectTenantDialog />
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Logout</DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={async () => {
+            await signOut();
+          }}
+        >
+          Logout
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

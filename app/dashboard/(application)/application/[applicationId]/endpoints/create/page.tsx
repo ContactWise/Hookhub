@@ -16,7 +16,7 @@ const CreateEndpointPage = () => {
 
   return (
     <>
-      <Typography variant={"pageTitle"}>Your Endpoints</Typography>
+      <Typography variant={"pageTitle"}>Create Endpoint</Typography>
       <ScrollArea className="flex flex-1 p-2 justify-center rounded-lg border border-dashed shadow-sm ">
         <CreateEndpointForm serviceId={serviceId} />
       </ScrollArea>

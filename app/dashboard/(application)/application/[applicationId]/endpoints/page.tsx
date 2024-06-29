@@ -89,7 +89,18 @@ const EndpointsPage = async ({ params }: any) => {
   return (
     <>
       <Typography variant={"pageTitle"}>Your Endpoints</Typography>
-      <ScrollArea className="flex flex-1 p-2 justify-center rounded-lg border border-dashed shadow-sm ">
+      <ScrollArea className="flex flex-1 p-2 justify-center rounded-lg border border-dashed shadow-sm h-1/2 ">
+        <div className="flex justify-between mb-2 items-center">
+          <Typography variant={"tableHeading"} className="text-lg">
+            Endpoints
+          </Typography>
+          {/* <AddEndpointSheet /> */}
+          <Link
+            href={`/dashboard/application/${applicationId}/endpoints/create`}
+          >
+            <Button>Create New Endpoint +</Button>
+          </Link>
+        </div>
         <HydrationBoundary state={dehydrate(queryClient)}>
           <EndpointsTable serviceId={applicationId} />
         </HydrationBoundary>

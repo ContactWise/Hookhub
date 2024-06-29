@@ -16,6 +16,7 @@ const getEndpoints = async (
     );
     return data;
   } catch (error) {
+    console.log("error", error);
     throw new Error("Error: Failed to fetch endpoints.");
   }
 };
@@ -40,27 +41,40 @@ const createEndpoint = async (
     throw new Error("Error: Failed to create endpoint.");
   }
 };
-// const createEndpoint = async (
-//   tenantId: string,
-//   workspaceId: string,
-//   serviceId: string,
-//   formData: z.infer<typeof endpointRequestSchema>
-// ) => {
-//   const data = endpointRequestSchema.parse(formData);
-//   console.log("datafor", { data });
-//   try {
-//     const res = await axios.post(
-//       `/api/v1/${tenantId}/workspaces/${workspaceId}/services/${serviceId}/endpoints`,
-//       {
-//         data,
-//       }
-//     );
-//     console.log("res", res);
-//     return res.data;
-//   } catch (error) {
-//     console.log("error", error);
-//     throw new Error("Error: Failed to create endpoint.");
-//   }
-// };
 
-export { getEndpoints, createEndpoint };
+const deleteEndpoint = async (
+  tenantId: string,
+  workspaceId: string,
+  serviceId: string,
+  endpointId: string
+) => {
+  try {
+    const res = await axios.delete(
+      `/api/v1/${tenantId}/workspaces/${workspaceId}/services/${serviceId}/endpoints/${endpointId}`
+    );
+    return res.data;
+  } catch (error) {
+    console.log("error", error);
+    throw new Error("Error: Failed to delete endpoint.");
+  }
+};
+const setActiveStatus = async (
+  tenantId: string,
+  workspaceId: string,
+  servicesId: string,
+  endpointId: string,
+  status: boolean
+) => {
+  const baseUrl = `/api/v1/${tenantId}/workspaces/${workspaceId}/services/${servicesId}/endpoints`;
+  const url = `${baseUrl}/${endpointId}/${status ? "activate" : "deactivate"}`;
+
+  try {
+    const res = await axios.patch(url);
+    return res.data;
+  } catch (error) {
+    console.log("error", error);
+    throw new Error("Error: Failed to set active status.");
+  }
+};
+
+export { getEndpoints, createEndpoint, deleteEndpoint, setActiveStatus };
