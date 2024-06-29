@@ -48,12 +48,11 @@ const SignInForm = () => {
   });
 
   const onSubmit = async (data: SignInFormValues) => {
-    const res = await signIn("credentials", { ...data, redirect: false });
-    if (res!.status === 200) {
-      return router.push("/dashboard/applications");
-    }
-
-    return toast(<div>Error Signing In</div>);
+    const res = await signIn("credentials", {
+      ...data,
+      redirect: true,
+      redirectTo: "/dashboard/applications",
+    });
   };
 
   return (

@@ -23,7 +23,7 @@ import { useEnvironmentContext } from "@/context/envContext";
 import { Switch } from "@/components/ui/switch";
 import { setActiveStatus } from "@/actions/credentials";
 import Typography from "@/components/custom/typography";
-import EditServiceSheet from "@/app/dashboard/(application)/application/[applicationId]/_components/editServiceSheet";
+import EditServiceSheet from "@/app/(secured)/dashboard/(application)/application/[applicationId]/_components/editServiceSheet";
 import DeleteRegistryDialog from "./deleteRegistryDialog";
 import EditRegistrySheet from "./editRegistrySheet";
 

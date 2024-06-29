@@ -9,6 +9,7 @@ import { promises as fs } from "fs";
 import { getWorkspaces } from "./actions/workspaces";
 import { User } from "lucide-react";
 import { getTenants } from "./actions/tenants";
+import authConfig from "@/auth.config";
 
 interface dBUser {
   id: number;
@@ -18,46 +19,6 @@ interface dBUser {
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  providers: [
-    Credentials({
-      // You can specify which fields should be submitted, by adding keys to the `credentials` object.
-      // e.g. domain, username, password, 2FA token, etc.
-      credentials: {
-        email: {
-          label: "email:",
-          type: "text",
-        },
-        password: {
-          label: "password:",
-          type: "password",
-        },
-      },
-      authorize: async (credentials) => {
-        const credsPath = path.join(process.cwd() + "/creds.json");
-        const credsFile = await fs.readFile(credsPath, "utf8");
-        const data = JSON.parse(credsFile);
-
-        const { email, password } = await signInSchema.parseAsync(credentials);
-        console.log("attempting to sign in with", email, password);
-
-        const user = data.users.find((u: dBUser) => u.email === email);
-
-        if (!user) {
-          throw new Error("User not found.");
-        }
-        if (user.password !== password) {
-          throw new Error("Invalid password.");
-        }
-
-        console.log("user authentication successful", user);
-        console.log("user found", user);
-        if (!user) {
-          throw new Error("User not found.");
-        }
-        return user;
-      },
-    }),
-  ],
   callbacks: {
     jwt: async ({ token, user, trigger, session }) => {
       if (trigger === "update" && session) {
@@ -91,13 +52,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return session;
     },
   },
+  ...authConfig,
 });
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-  tenant: string;
-  workspace: string;
-}

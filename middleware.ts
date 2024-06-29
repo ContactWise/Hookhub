@@ -1,5 +1,15 @@
 import { NextResponse, NextRequest } from "next/server";
-import { auth } from "./auth";
+// import { auth } from "./auth";
+import NextAuth from "next-auth";
+import authConfig from "@/auth.config";
+import {
+  DEFAULT_LOGIN_REDIRECT_URL,
+  apiAuthRoutes,
+  authRoutes,
+  publicRoutes,
+} from "@/routes";
+
+const { auth } = NextAuth(authConfig);
 
 type RedirectEntry = {
   destination: string;
@@ -17,35 +27,42 @@ const redirects: Record<string, RedirectEntry> = {
   },
 };
 
-export async function middleware(request: NextRequest) {
-  const session = await auth();
-  console.log("in middleware");
-  const pathname = request.nextUrl.pathname;
-  console.log("session", session);
-  // Redirect logged-in users trying to visit /auth/signin to /dashboard
-  if (session && pathname === "/auth/signin") {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+export default auth(async (req) => {
+  const isLoggedIn = !!req.auth;
+  const { nextUrl } = req;
+  const pathName = nextUrl.pathname;
+  const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthRoutes);
+  const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
+  const isAuthRoute = authRoutes.includes(nextUrl.pathname);
+
+  // Allow all users to access api routes
+  if (isApiAuthRoute) {
+    return;
   }
 
-  // Redirect users without a session trying to access any path other than /auth/signin to /auth/signin
-  if (!session && pathname !== "/auth/signin") {
-    return NextResponse.redirect(new URL("/auth/signin", request.url));
+  if (isAuthRoute) {
+    if (isLoggedIn) {
+      return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT_URL, nextUrl));
+    }
+    return;
   }
 
-  // Handle predefined redirects for logged-in users
-  const redirectData = redirects[pathname];
-  if (session?.user && redirectData) {
+  if (!isLoggedIn && !isPublicRoute) {
+    return Response.redirect(new URL("/auth/signin", nextUrl));
+  }
+
+  const redirectData = redirects[pathName];
+  if (isLoggedIn && redirectData) {
     const statusCode = redirectData.permanent ? 308 : 307;
     return NextResponse.redirect(
-      new URL(redirectData.destination, request.url),
+      new URL(redirectData.destination, req.url),
       statusCode
     );
   }
 
-  // No redirect necessary, continue with the request
-  return NextResponse.next();
-}
+  return;
+});
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
 };
